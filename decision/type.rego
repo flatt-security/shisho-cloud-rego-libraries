@@ -33,3 +33,14 @@ as_decision_type(t) := type_allow {
 } else := type_deny {
 	true
 }
+
+# METADATA
+# title: "Determines whether a decision allows input"
+# scope: "rule"
+# description: |
+#   Determines whether a decision allows input.
+is_allowed(d) {
+	d.header.type == type_allow
+} else = false {
+	true
+}

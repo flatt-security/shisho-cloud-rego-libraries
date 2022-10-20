@@ -18,9 +18,14 @@ import data.shisho
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.source.version_control_entry({
+#     shisho.decision.source.version_control_entry_v2(policyReportId, {
 #       "type": type,
 #     }),
 #   ]
@@ -110,5 +115,19 @@ version_control_entry_with_severity(report_id, severity, type) = x {
 		"severity": severity,
 		"resource_id": shisho.decision.as_resource_id(report_id),
 		"data": json.marshal({"type": type}),
+	}
+}
+
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:version_control"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:version_control with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+version_control_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
 	}
 }

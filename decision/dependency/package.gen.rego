@@ -18,9 +18,14 @@ import data.shisho
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.dependency.package_known_vulnerability_entry({
+#     shisho.decision.dependency.package_known_vulnerability_entry_v2(policyReportId, {
 #       "advisories": advisories,
 #       "description": description,
 #       "found_at": found_at,
@@ -131,5 +136,19 @@ package_known_vulnerability_entry_with_severity(report_id, severity, advisories,
 		"severity": severity,
 		"resource_id": shisho.decision.as_resource_id(report_id),
 		"data": json.marshal({"advisories": advisories, "description": description, "found_at": found_at, "name": name, "version": version, "vuln_constraint": vuln_constraint, "vuln_id": vuln_id, "vuln_namespace": vuln_namespace}),
+	}
+}
+
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:package_known_vulnerability"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:package_known_vulnerability with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+package_known_vulnerability_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
 	}
 }

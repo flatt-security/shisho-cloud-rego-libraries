@@ -18,9 +18,14 @@ import data.shisho
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.org_2fa_status_entry({
+#     shisho.decision.github.org_2fa_status_entry_v2(policyReportId, {
 #     }),
 #   ]
 #
@@ -104,6 +109,20 @@ org_2fa_status_entry_with_severity(report_id, severity) = x {
 	}
 }
 
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:org_2fa_status"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:org_2fa_status with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+org_2fa_status_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
+	}
+}
+
 # @title Ensure strict base permissions are set for repositories
 # You can emit this decision as follows:
 # 
@@ -117,9 +136,14 @@ org_2fa_status_entry_with_severity(report_id, severity) = x {
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.org_default_repository_permission_entry({
+#     shisho.decision.github.org_default_repository_permission_entry_v2(policyReportId, {
 #       "current": current,
 #     }),
 #   ]
@@ -212,6 +236,20 @@ org_default_repository_permission_entry_with_severity(report_id, severity, curre
 	}
 }
 
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:org_default_repository_permission"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:org_default_repository_permission with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+org_default_repository_permission_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
+	}
+}
+
 # @title Ensure creation of GitHub public pages is restricted
 # You can emit this decision as follows:
 # 
@@ -225,9 +263,14 @@ org_default_repository_permission_entry_with_severity(report_id, severity, curre
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.org_members_permission_on_creating_public_pages_entry({
+#     shisho.decision.github.org_members_permission_on_creating_public_pages_entry_v2(policyReportId, {
 #       "allowed": allowed,
 #     }),
 #   ]
@@ -317,6 +360,20 @@ org_members_permission_on_creating_public_pages_entry_with_severity(report_id, s
 	}
 }
 
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:org_members_permission_on_creating_public_pages"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:org_members_permission_on_creating_public_pages with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+org_members_permission_on_creating_public_pages_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
+	}
+}
+
 # @title Ensure public repository creation is limited to specific members
 # You can emit this decision as follows:
 # 
@@ -330,9 +387,14 @@ org_members_permission_on_creating_public_pages_entry_with_severity(report_id, s
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.org_members_permission_on_creating_public_repos_entry({
+#     shisho.decision.github.org_members_permission_on_creating_public_repos_entry_v2(policyReportId, {
 #       "allowed": allowed,
 #     }),
 #   ]
@@ -422,6 +484,20 @@ org_members_permission_on_creating_public_repos_entry_with_severity(report_id, s
 	}
 }
 
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:org_members_permission_on_creating_public_repos"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:org_members_permission_on_creating_public_repos with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+org_members_permission_on_creating_public_repos_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
+	}
+}
+
 # @title Ensure forking of GitHub repositories is restricted
 # You can emit this decision as follows:
 # 
@@ -435,9 +511,14 @@ org_members_permission_on_creating_public_repos_entry_with_severity(report_id, s
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.org_members_permission_on_private_forking_entry({
+#     shisho.decision.github.org_members_permission_on_private_forking_entry_v2(policyReportId, {
 #       "allowed": allowed,
 #     }),
 #   ]
@@ -527,6 +608,20 @@ org_members_permission_on_private_forking_entry_with_severity(report_id, severit
 	}
 }
 
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:org_members_permission_on_private_forking"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:org_members_permission_on_private_forking with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+org_members_permission_on_private_forking_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
+	}
+}
+
 # @title Ensure minimum number of administrators are set for the organization
 # You can emit this decision as follows:
 # 
@@ -540,9 +635,14 @@ org_members_permission_on_private_forking_entry_with_severity(report_id, severit
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.org_owners_entry({
+#     shisho.decision.github.org_owners_entry_v2(policyReportId, {
 #       "admins": admins,
 #     }),
 #   ]
@@ -632,5 +732,19 @@ org_owners_entry_with_severity(report_id, severity, admins) = x {
 		"severity": severity,
 		"resource_id": shisho.decision.as_resource_id(report_id),
 		"data": json.marshal({"admins": admins}),
+	}
+}
+
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:org_owners"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:org_owners with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+org_owners_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
 	}
 }

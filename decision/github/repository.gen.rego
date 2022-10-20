@@ -18,9 +18,14 @@ import data.shisho
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.code_owners_review_policy_entry({
+#     shisho.decision.github.code_owners_review_policy_entry_v2(policyReportId, {
 #       "required": required,
 #       "subject_branch": subject_branch,
 #     }),
@@ -116,6 +121,20 @@ code_owners_review_policy_entry_with_severity(report_id, severity, required, sub
 	}
 }
 
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:code_owners_review_policy"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:code_owners_review_policy with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+code_owners_review_policy_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
+	}
+}
+
 # @title Ensure verification of signed commits for new changes before merging
 # You can emit this decision as follows:
 # 
@@ -129,9 +148,14 @@ code_owners_review_policy_entry_with_severity(report_id, severity, required, sub
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.commit_signature_policy_entry({
+#     shisho.decision.github.commit_signature_policy_entry_v2(policyReportId, {
 #       "required": required,
 #       "subject_branch": subject_branch,
 #     }),
@@ -227,6 +251,20 @@ commit_signature_policy_entry_with_severity(report_id, severity, required, subje
 	}
 }
 
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:commit_signature_policy"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:commit_signature_policy with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+commit_signature_policy_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
+	}
+}
+
 # @title Keep a default branch protected by branch protection rule(s)
 # You can emit this decision as follows:
 # 
@@ -240,9 +278,14 @@ commit_signature_policy_entry_with_severity(report_id, severity, required, subje
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.default_branch_protection_entry({
+#     shisho.decision.github.default_branch_protection_entry_v2(policyReportId, {
 #       "default_branch_name": default_branch_name,
 #     }),
 #   ]
@@ -335,6 +378,20 @@ default_branch_protection_entry_with_severity(report_id, severity, default_branc
 	}
 }
 
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:default_branch_protection"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:default_branch_protection with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+default_branch_protection_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
+	}
+}
+
 # @title Ensure force push code to branches is denied
 # You can emit this decision as follows:
 # 
@@ -348,9 +405,14 @@ default_branch_protection_entry_with_severity(report_id, severity, default_branc
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.force_push_policy_entry({
+#     shisho.decision.github.force_push_policy_entry_v2(policyReportId, {
 #       "allowed": allowed,
 #       "subject_branch": subject_branch,
 #     }),
@@ -446,6 +508,20 @@ force_push_policy_entry_with_severity(report_id, severity, allowed, subject_bran
 	}
 }
 
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:force_push_policy"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:force_push_policy with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+force_push_policy_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
+	}
+}
+
 # @title Ensure linear history is required
 # You can emit this decision as follows:
 # 
@@ -459,9 +535,14 @@ force_push_policy_entry_with_severity(report_id, severity, allowed, subject_bran
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.linear_history_policy_entry({
+#     shisho.decision.github.linear_history_policy_entry_v2(policyReportId, {
 #       "required": required,
 #       "subject_branch": subject_branch,
 #     }),
@@ -557,6 +638,20 @@ linear_history_policy_entry_with_severity(report_id, severity, required, subject
 	}
 }
 
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:linear_history_policy"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:linear_history_policy with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+linear_history_policy_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
+	}
+}
+
 # @title Ensure any change to code receives the enough number of approvals by authenticated users
 # You can emit this decision as follows:
 # 
@@ -570,9 +665,14 @@ linear_history_policy_entry_with_severity(report_id, severity, required, subject
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.minimum_approval_number_policy_entry({
+#     shisho.decision.github.minimum_approval_number_policy_entry_v2(policyReportId, {
 #       "required_approval_count": required_approval_count,
 #       "subject_branch": subject_branch,
 #     }),
@@ -668,6 +768,20 @@ minimum_approval_number_policy_entry_with_severity(report_id, severity, required
 	}
 }
 
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:minimum_approval_number_policy"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:minimum_approval_number_policy with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+minimum_approval_number_policy_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
+	}
+}
+
 # @title Ensure branch protection rules are enforced for administrators
 # You can emit this decision as follows:
 # 
@@ -681,9 +795,14 @@ minimum_approval_number_policy_entry_with_severity(report_id, severity, required
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.protection_enforcement_for_admins_entry({
+#     shisho.decision.github.protection_enforcement_for_admins_entry_v2(policyReportId, {
 #       "allowed": allowed,
 #       "subject_branch": subject_branch,
 #     }),
@@ -779,6 +898,20 @@ protection_enforcement_for_admins_entry_with_severity(report_id, severity, allow
 	}
 }
 
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:protection_enforcement_for_admins"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:protection_enforcement_for_admins with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+protection_enforcement_for_admins_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
+	}
+}
+
 # @title Ensure previous approvals are dismissed when updates are introduced to a code change proposal
 # You can emit this decision as follows:
 # 
@@ -792,9 +925,14 @@ protection_enforcement_for_admins_entry_with_severity(report_id, severity, allow
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
+#   # See the following for further information:
+#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
+#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
+#   policyReportId := "..."
+#
 #   # evidence for the decision
 #   entries := [
-#     shisho.decision.github.stale_review_policy_entry({
+#     shisho.decision.github.stale_review_policy_entry_v2(policyReportId, {
 #       "enforced": enforced,
 #       "subject_branch": subject_branch,
 #     }),
@@ -887,5 +1025,19 @@ stale_review_policy_entry_with_severity(report_id, severity, enforced, subject_b
 		"severity": severity,
 		"resource_id": shisho.decision.as_resource_id(report_id),
 		"data": json.marshal({"enforced": enforced, "subject_branch": subject_branch}),
+	}
+}
+
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:stale_review_policy"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:stale_review_policy with a specified severity.
+#   Visit decision/decision.rego to see all the severities.
+stale_review_policy_entry_v2_with_severity(report_id, severity, edata) = x {
+	x := {
+		"severity": severity,
+		"resource_id": shisho.decision.as_resource_id(report_id),
+		"data": json.marshal(edata),
 	}
 }

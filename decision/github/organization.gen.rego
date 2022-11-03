@@ -144,7 +144,7 @@ org_2fa_status_entry_v2_with_severity(report_id, severity, edata) = x {
 #   # evidence for the decision
 #   entries := [
 #     shisho.decision.github.org_default_repository_permission_entry_v2(policyReportId, {
-#       "current": current,
+#       "current": ["example"],
 #     }),
 #   ]
 #
@@ -208,10 +208,10 @@ org_default_repository_permission_entry(report_id, current) = x {
 #   The parameter `data` is an object with the following fields: 
 #   - current: string
 #
-#   For instance:
+#   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     current: "dummy",
+#     "current": ["example"],
 #   }
 #   ```
 org_default_repository_permission_entry_v2(report_id, edata) = x {
@@ -271,7 +271,7 @@ org_default_repository_permission_entry_v2_with_severity(report_id, severity, ed
 #   # evidence for the decision
 #   entries := [
 #     shisho.decision.github.org_members_permission_on_creating_public_pages_entry_v2(policyReportId, {
-#       "allowed": allowed,
+#       "allowed": false,
 #     }),
 #   ]
 #
@@ -332,10 +332,10 @@ org_members_permission_on_creating_public_pages_entry(report_id, allowed) = x {
 #   The parameter `data` is an object with the following fields: 
 #   - allowed: boolean
 #
-#   For instance:
+#   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     allowed: false,
+#     "allowed": false,
 #   }
 #   ```
 org_members_permission_on_creating_public_pages_entry_v2(report_id, edata) = x {
@@ -395,7 +395,7 @@ org_members_permission_on_creating_public_pages_entry_v2_with_severity(report_id
 #   # evidence for the decision
 #   entries := [
 #     shisho.decision.github.org_members_permission_on_creating_public_repos_entry_v2(policyReportId, {
-#       "allowed": allowed,
+#       "allowed": false,
 #     }),
 #   ]
 #
@@ -430,7 +430,10 @@ org_members_permission_on_creating_public_repos_header(h) = x {
 		"kind": org_members_permission_on_creating_public_repos_kind,
 		"subject": h.subject,
 		"labels": {},
-		"annotations": {"decision.api.shisho.dev:ssc/category": "source"},
+		"annotations": {
+			"decision.api.shisho.dev:ssc/category": "source",
+			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.2.2",
+		},
 		"type": shisho.decision.as_decision_type(h.allowed),
 	}
 }
@@ -456,10 +459,10 @@ org_members_permission_on_creating_public_repos_entry(report_id, allowed) = x {
 #   The parameter `data` is an object with the following fields: 
 #   - allowed: boolean
 #
-#   For instance:
+#   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     allowed: false,
+#     "allowed": false,
 #   }
 #   ```
 org_members_permission_on_creating_public_repos_entry_v2(report_id, edata) = x {
@@ -519,7 +522,7 @@ org_members_permission_on_creating_public_repos_entry_v2_with_severity(report_id
 #   # evidence for the decision
 #   entries := [
 #     shisho.decision.github.org_members_permission_on_private_forking_entry_v2(policyReportId, {
-#       "allowed": allowed,
+#       "allowed": false,
 #     }),
 #   ]
 #
@@ -580,10 +583,10 @@ org_members_permission_on_private_forking_entry(report_id, allowed) = x {
 #   The parameter `data` is an object with the following fields: 
 #   - allowed: boolean
 #
-#   For instance:
+#   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     allowed: false,
+#     "allowed": false,
 #   }
 #   ```
 org_members_permission_on_private_forking_entry_v2(report_id, edata) = x {
@@ -643,7 +646,7 @@ org_members_permission_on_private_forking_entry_v2_with_severity(report_id, seve
 #   # evidence for the decision
 #   entries := [
 #     shisho.decision.github.org_owners_entry_v2(policyReportId, {
-#       "admins": admins,
+#       "admins": ["example"],
 #     }),
 #   ]
 #
@@ -707,10 +710,10 @@ org_owners_entry(report_id, admins) = x {
 #   The parameter `data` is an object with the following fields: 
 #   - admins: string
 #
-#   For instance:
+#   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     admins: "dummy",
+#     "admins": ["example"],
 #   }
 #   ```
 org_owners_entry_v2(report_id, edata) = x {

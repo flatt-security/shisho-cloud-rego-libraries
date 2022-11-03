@@ -26,7 +26,7 @@ import data.shisho
 #   # evidence for the decision
 #   entries := [
 #     shisho.decision.source.version_control_entry_v2(policyReportId, {
-#       "type": type,
+#       "type": "example",
 #     }),
 #   ]
 #
@@ -90,10 +90,10 @@ version_control_entry(report_id, type) = x {
 #   The parameter `data` is an object with the following fields: 
 #   - type: string
 #
-#   For instance:
+#   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     type: "dummy",
+#     "type": "example",
 #   }
 #   ```
 version_control_entry_v2(report_id, edata) = x {

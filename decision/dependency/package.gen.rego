@@ -26,14 +26,14 @@ import data.shisho
 #   # evidence for the decision
 #   entries := [
 #     shisho.decision.dependency.package_known_vulnerability_entry_v2(policyReportId, {
-#       "advisories": advisories,
-#       "description": description,
-#       "found_at": found_at,
-#       "name": name,
-#       "version": version,
-#       "vuln_constraint": vuln_constraint,
-#       "vuln_id": vuln_id,
-#       "vuln_namespace": vuln_namespace,
+#       "advisories": ["example"],
+#       "description": "example",
+#       "found_at": "example",
+#       "name": "example",
+#       "version": "example",
+#       "vuln_constraint": "example",
+#       "vuln_id": "example",
+#       "vuln_namespace": "example",
 #     }),
 #   ]
 #
@@ -104,17 +104,17 @@ package_known_vulnerability_entry(report_id, advisories, description, found_at, 
 #   - vuln_id: string
 #   - vuln_namespace: string
 #
-#   For instance:
+#   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     advisories: "dummy",
-#     description: "dummy",
-#     found_at: "dummy",
-#     name: "dummy",
-#     version: "dummy",
-#     vuln_constraint: "dummy",
-#     vuln_id: "dummy",
-#     vuln_namespace: "dummy",
+#     "advisories": ["example"],
+#     "description": "example",
+#     "found_at": "example",
+#     "name": "example",
+#     "version": "example",
+#     "vuln_constraint": "example",
+#     "vuln_id": "example",
+#     "vuln_namespace": "example",
 #   }
 #   ```
 package_known_vulnerability_entry_v2(report_id, edata) = x {

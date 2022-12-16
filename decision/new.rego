@@ -1,5 +1,7 @@
 package shisho.decision
 
+import data.shisho
+
 # METADATA
 # title: "Emits a decision to Shisho Cloud"
 # scope: "rule"

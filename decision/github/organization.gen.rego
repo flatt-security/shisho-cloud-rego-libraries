@@ -30,7 +30,7 @@ import data.shisho
 #   ]
 #
 #   d := shisho.decision.github.org_2fa_status({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -149,7 +149,7 @@ org_2fa_status_entry_v2_with_severity(report_id, severity, edata) = x {
 #   ]
 #
 #   d := shisho.decision.github.org_default_repository_permission({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -276,7 +276,7 @@ org_default_repository_permission_entry_v2_with_severity(report_id, severity, ed
 #   ]
 #
 #   d := shisho.decision.github.org_members_permission_on_creating_public_pages({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -400,7 +400,7 @@ org_members_permission_on_creating_public_pages_entry_v2_with_severity(report_id
 #   ]
 #
 #   d := shisho.decision.github.org_members_permission_on_creating_public_repos({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -527,7 +527,7 @@ org_members_permission_on_creating_public_repos_entry_v2_with_severity(report_id
 #   ]
 #
 #   d := shisho.decision.github.org_members_permission_on_private_forking({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -651,7 +651,7 @@ org_members_permission_on_private_forking_entry_v2_with_severity(report_id, seve
 #   ]
 #
 #   d := shisho.decision.github.org_owners({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })

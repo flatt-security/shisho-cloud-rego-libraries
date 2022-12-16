@@ -32,7 +32,7 @@ import data.shisho
 #   ]
 #
 #   d := shisho.decision.github.branch_deletion_policy({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -162,7 +162,7 @@ branch_deletion_policy_entry_v2_with_severity(report_id, severity, edata) = x {
 #   ]
 #
 #   d := shisho.decision.github.code_owners_review_policy({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -292,7 +292,7 @@ code_owners_review_policy_entry_v2_with_severity(report_id, severity, edata) = x
 #   ]
 #
 #   d := shisho.decision.github.commit_signature_policy({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -421,7 +421,7 @@ commit_signature_policy_entry_v2_with_severity(report_id, severity, edata) = x {
 #   ]
 #
 #   d := shisho.decision.github.default_branch_protection({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -549,7 +549,7 @@ default_branch_protection_entry_v2_with_severity(report_id, severity, edata) = x
 #   ]
 #
 #   d := shisho.decision.github.force_push_policy({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -679,7 +679,7 @@ force_push_policy_entry_v2_with_severity(report_id, severity, edata) = x {
 #   ]
 #
 #   d := shisho.decision.github.linear_history_policy({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -809,7 +809,7 @@ linear_history_policy_entry_v2_with_severity(report_id, severity, edata) = x {
 #   ]
 #
 #   d := shisho.decision.github.minimum_approval_number_policy({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -939,7 +939,7 @@ minimum_approval_number_policy_entry_v2_with_severity(report_id, severity, edata
 #   ]
 #
 #   d := shisho.decision.github.protection_enforcement_for_admins({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -1068,7 +1068,7 @@ protection_enforcement_for_admins_entry_v2_with_severity(report_id, severity, ed
 #   ]
 #
 #   d := shisho.decision.github.repo_admins({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -1195,7 +1195,7 @@ repo_admins_entry_v2_with_severity(report_id, severity, edata) = x {
 #   ]
 #
 #   d := shisho.decision.github.repo_members_permission_on_deleting_repository({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })
@@ -1323,7 +1323,7 @@ repo_members_permission_on_deleting_repository_entry_v2_with_severity(report_id,
 #   ]
 #
 #   d := shisho.decision.github.stale_review_policy({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })

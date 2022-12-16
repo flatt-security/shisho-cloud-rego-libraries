@@ -31,7 +31,7 @@ import data.shisho
 #   ]
 #
 #   d := shisho.decision.source.version_control({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })

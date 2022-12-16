@@ -38,7 +38,7 @@ import data.shisho
 #   ]
 #
 #   d := shisho.decision.dependency.package_known_vulnerability({
-#     "allowed": allowed
+#     "allowed": allowed,
 #     "subject": subject,
 #     "entries": entries,
 #   })

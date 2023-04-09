@@ -5,7 +5,7 @@ package shisho.job
 # scope: "rule"
 # description: |
 #   Represents an exit code of a workflow job.
-exit_code_determined = 0
+exit_code_undetermined = 0
 
 # METADATA
 # title: "Exit code of a workflow job (undecidable)"

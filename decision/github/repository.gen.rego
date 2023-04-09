@@ -12,55 +12,59 @@ import data.shisho
 # import data.shisho
 # 
 # decisions[d] {
-#   # the target of the decision (e.g. a GitHub repository, etc.)
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
 #
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   # See the following for further information:
-#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
-#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
-#   policyReportId := "..."
-#
-#   # evidence for the decision
-#   entries := [
-#     shisho.decision.github.branch_deletion_policy_entry_v2(policyReportId, {
-#       "allowed": false,
-#       "subject_branch": "example",
-#     }),
-#   ]
-#
 #   d := shisho.decision.github.branch_deletion_policy({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "entries": entries,
+#     "payload": shisho.decision.github.branch_deletion_policy_payload({
+#       "allowed": false,
+#       "subject_branch": "example",
+#     }),
 #   })
 # }
 # ```
 
 # METADATA
-# title: "decision.api.shisho.dev/v1beta:branch_deletion_policy"
+# title: "decision.api.shisho.dev/v1beta:github_branch_deletion_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:branch_deletion_policy".
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_branch_deletion_policy".
 branch_deletion_policy(d) = x {
 	x := {
 		"header": branch_deletion_policy_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
+			"locator": branch_deletion_policy_locator(d),
+			"severity": branch_deletion_policy_severity(d),
 		}),
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }
 
-branch_deletion_policy_kind = "branch_deletion_policy"
+branch_deletion_policy_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 2
+
+branch_deletion_policy_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
+
+branch_deletion_policy_kind = "github_branch_deletion_policy"
 
 branch_deletion_policy_header(h) = x {
 	x := {
 		"api_version": "decision.api.shisho.dev/v1beta",
 		"kind": branch_deletion_policy_kind,
 		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:ssc/category": "source",
@@ -71,22 +75,10 @@ branch_deletion_policy_header(h) = x {
 }
 
 # METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:branch_deletion_policy"
-# scope: "rule"
-# description: "Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:branch_deletion_policy"
-branch_deletion_policy_entry(report_id, allowed, subject_branch) = x {
-	x := {
-		"severity": 2,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"allowed": allowed, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:branch_deletion_policy"
+# title: "Entry of decision.api.shisho.dev/v1beta:github_branch_deletion_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:branch_deletion_policy
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_branch_deletion_policy
 #
 #   The parameter `data` is an object with the following fields: 
 #   - allowed: boolean
@@ -99,40 +91,8 @@ branch_deletion_policy_entry(report_id, allowed, subject_branch) = x {
 #     "subject_branch": "example",
 #   }
 #   ```
-branch_deletion_policy_entry_v2(report_id, edata) = x {
-	x := {
-		"severity": 2,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:branch_deletion_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:branch_deletion_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-branch_deletion_policy_entry_with_severity(report_id, severity, allowed, subject_branch) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"allowed": allowed, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:branch_deletion_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:branch_deletion_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-branch_deletion_policy_entry_v2_with_severity(report_id, severity, edata) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
+branch_deletion_policy_payload(edata) = x {
+	x := json.marshal(edata)
 }
 
 # @title Ensure code owner’s review is required when a change affects owned code
@@ -142,55 +102,59 @@ branch_deletion_policy_entry_v2_with_severity(report_id, severity, edata) = x {
 # import data.shisho
 # 
 # decisions[d] {
-#   # the target of the decision (e.g. a GitHub repository, etc.)
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
 #
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   # See the following for further information:
-#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
-#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
-#   policyReportId := "..."
-#
-#   # evidence for the decision
-#   entries := [
-#     shisho.decision.github.code_owners_review_policy_entry_v2(policyReportId, {
-#       "required": false,
-#       "subject_branch": "example",
-#     }),
-#   ]
-#
 #   d := shisho.decision.github.code_owners_review_policy({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "entries": entries,
+#     "payload": shisho.decision.github.code_owners_review_policy_payload({
+#       "required": false,
+#       "subject_branch": "example",
+#     }),
 #   })
 # }
 # ```
 
 # METADATA
-# title: "decision.api.shisho.dev/v1beta:code_owners_review_policy"
+# title: "decision.api.shisho.dev/v1beta:github_code_owners_review_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:code_owners_review_policy".
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_code_owners_review_policy".
 code_owners_review_policy(d) = x {
 	x := {
 		"header": code_owners_review_policy_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
+			"locator": code_owners_review_policy_locator(d),
+			"severity": code_owners_review_policy_severity(d),
 		}),
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }
 
-code_owners_review_policy_kind = "code_owners_review_policy"
+code_owners_review_policy_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 1
+
+code_owners_review_policy_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
+
+code_owners_review_policy_kind = "github_code_owners_review_policy"
 
 code_owners_review_policy_header(h) = x {
 	x := {
 		"api_version": "decision.api.shisho.dev/v1beta",
 		"kind": code_owners_review_policy_kind,
 		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:ssc/category": "source",
@@ -201,22 +165,10 @@ code_owners_review_policy_header(h) = x {
 }
 
 # METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:code_owners_review_policy"
-# scope: "rule"
-# description: "Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:code_owners_review_policy"
-code_owners_review_policy_entry(report_id, required, subject_branch) = x {
-	x := {
-		"severity": 1,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"required": required, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:code_owners_review_policy"
+# title: "Entry of decision.api.shisho.dev/v1beta:github_code_owners_review_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:code_owners_review_policy
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_code_owners_review_policy
 #
 #   The parameter `data` is an object with the following fields: 
 #   - required: boolean
@@ -229,40 +181,8 @@ code_owners_review_policy_entry(report_id, required, subject_branch) = x {
 #     "subject_branch": "example",
 #   }
 #   ```
-code_owners_review_policy_entry_v2(report_id, edata) = x {
-	x := {
-		"severity": 1,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:code_owners_review_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:code_owners_review_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-code_owners_review_policy_entry_with_severity(report_id, severity, required, subject_branch) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"required": required, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:code_owners_review_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:code_owners_review_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-code_owners_review_policy_entry_v2_with_severity(report_id, severity, edata) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
+code_owners_review_policy_payload(edata) = x {
+	x := json.marshal(edata)
 }
 
 # @title Ensure verification of signed commits for new changes before merging
@@ -272,55 +192,59 @@ code_owners_review_policy_entry_v2_with_severity(report_id, severity, edata) = x
 # import data.shisho
 # 
 # decisions[d] {
-#   # the target of the decision (e.g. a GitHub repository, etc.)
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
 #
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   # See the following for further information:
-#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
-#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
-#   policyReportId := "..."
-#
-#   # evidence for the decision
-#   entries := [
-#     shisho.decision.github.commit_signature_policy_entry_v2(policyReportId, {
-#       "required": false,
-#       "subject_branch": "example",
-#     }),
-#   ]
-#
 #   d := shisho.decision.github.commit_signature_policy({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "entries": entries,
+#     "payload": shisho.decision.github.commit_signature_policy_payload({
+#       "required": false,
+#       "subject_branch": "example",
+#     }),
 #   })
 # }
 # ```
 
 # METADATA
-# title: "decision.api.shisho.dev/v1beta:commit_signature_policy"
+# title: "decision.api.shisho.dev/v1beta:github_commit_signature_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:commit_signature_policy".
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_commit_signature_policy".
 commit_signature_policy(d) = x {
 	x := {
 		"header": commit_signature_policy_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
+			"locator": commit_signature_policy_locator(d),
+			"severity": commit_signature_policy_severity(d),
 		}),
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }
 
-commit_signature_policy_kind = "commit_signature_policy"
+commit_signature_policy_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 0
+
+commit_signature_policy_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
+
+commit_signature_policy_kind = "github_commit_signature_policy"
 
 commit_signature_policy_header(h) = x {
 	x := {
 		"api_version": "decision.api.shisho.dev/v1beta",
 		"kind": commit_signature_policy_kind,
 		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:ssc/category": "source",
@@ -331,22 +255,10 @@ commit_signature_policy_header(h) = x {
 }
 
 # METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:commit_signature_policy"
-# scope: "rule"
-# description: "Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:commit_signature_policy"
-commit_signature_policy_entry(report_id, required, subject_branch) = x {
-	x := {
-		"severity": 0,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"required": required, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:commit_signature_policy"
+# title: "Entry of decision.api.shisho.dev/v1beta:github_commit_signature_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:commit_signature_policy
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_commit_signature_policy
 #
 #   The parameter `data` is an object with the following fields: 
 #   - required: boolean
@@ -359,40 +271,8 @@ commit_signature_policy_entry(report_id, required, subject_branch) = x {
 #     "subject_branch": "example",
 #   }
 #   ```
-commit_signature_policy_entry_v2(report_id, edata) = x {
-	x := {
-		"severity": 0,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:commit_signature_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:commit_signature_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-commit_signature_policy_entry_with_severity(report_id, severity, required, subject_branch) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"required": required, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:commit_signature_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:commit_signature_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-commit_signature_policy_entry_v2_with_severity(report_id, severity, edata) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
+commit_signature_policy_payload(edata) = x {
+	x := json.marshal(edata)
 }
 
 # @title Keep a default branch protected by branch protection rule(s)
@@ -402,54 +282,58 @@ commit_signature_policy_entry_v2_with_severity(report_id, severity, edata) = x {
 # import data.shisho
 # 
 # decisions[d] {
-#   # the target of the decision (e.g. a GitHub repository, etc.)
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
 #
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   # See the following for further information:
-#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
-#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
-#   policyReportId := "..."
-#
-#   # evidence for the decision
-#   entries := [
-#     shisho.decision.github.default_branch_protection_entry_v2(policyReportId, {
-#       "default_branch_name": "example",
-#     }),
-#   ]
-#
 #   d := shisho.decision.github.default_branch_protection({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "entries": entries,
+#     "payload": shisho.decision.github.default_branch_protection_payload({
+#       "default_branch_name": "example",
+#     }),
 #   })
 # }
 # ```
 
 # METADATA
-# title: "decision.api.shisho.dev/v1beta:default_branch_protection"
+# title: "decision.api.shisho.dev/v1beta:github_default_branch_protection"
 # scope: "rule"
 # description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:default_branch_protection".
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_default_branch_protection".
 default_branch_protection(d) = x {
 	x := {
 		"header": default_branch_protection_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
+			"locator": default_branch_protection_locator(d),
+			"severity": default_branch_protection_severity(d),
 		}),
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }
 
-default_branch_protection_kind = "default_branch_protection"
+default_branch_protection_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 2
+
+default_branch_protection_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
+
+default_branch_protection_kind = "github_default_branch_protection"
 
 default_branch_protection_header(h) = x {
 	x := {
 		"api_version": "decision.api.shisho.dev/v1beta",
 		"kind": default_branch_protection_kind,
 		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:ssc/category": "source",
@@ -460,22 +344,10 @@ default_branch_protection_header(h) = x {
 }
 
 # METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:default_branch_protection"
-# scope: "rule"
-# description: "Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:default_branch_protection"
-default_branch_protection_entry(report_id, default_branch_name) = x {
-	x := {
-		"severity": 2,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"default_branch_name": default_branch_name}),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:default_branch_protection"
+# title: "Entry of decision.api.shisho.dev/v1beta:github_default_branch_protection"
 # scope: "rule"
 # description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:default_branch_protection
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_default_branch_protection
 #
 #   The parameter `data` is an object with the following fields: 
 #   - default_branch_name: string
@@ -486,40 +358,8 @@ default_branch_protection_entry(report_id, default_branch_name) = x {
 #     "default_branch_name": "example",
 #   }
 #   ```
-default_branch_protection_entry_v2(report_id, edata) = x {
-	x := {
-		"severity": 2,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:default_branch_protection"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:default_branch_protection with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-default_branch_protection_entry_with_severity(report_id, severity, default_branch_name) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"default_branch_name": default_branch_name}),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:default_branch_protection"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:default_branch_protection with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-default_branch_protection_entry_v2_with_severity(report_id, severity, edata) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
+default_branch_protection_payload(edata) = x {
+	x := json.marshal(edata)
 }
 
 # @title Ensure force push code to branches is denied
@@ -529,55 +369,59 @@ default_branch_protection_entry_v2_with_severity(report_id, severity, edata) = x
 # import data.shisho
 # 
 # decisions[d] {
-#   # the target of the decision (e.g. a GitHub repository, etc.)
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
 #
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   # See the following for further information:
-#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
-#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
-#   policyReportId := "..."
-#
-#   # evidence for the decision
-#   entries := [
-#     shisho.decision.github.force_push_policy_entry_v2(policyReportId, {
-#       "allowed": false,
-#       "subject_branch": "example",
-#     }),
-#   ]
-#
 #   d := shisho.decision.github.force_push_policy({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "entries": entries,
+#     "payload": shisho.decision.github.force_push_policy_payload({
+#       "allowed": false,
+#       "subject_branch": "example",
+#     }),
 #   })
 # }
 # ```
 
 # METADATA
-# title: "decision.api.shisho.dev/v1beta:force_push_policy"
+# title: "decision.api.shisho.dev/v1beta:github_force_push_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:force_push_policy".
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_force_push_policy".
 force_push_policy(d) = x {
 	x := {
 		"header": force_push_policy_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
+			"locator": force_push_policy_locator(d),
+			"severity": force_push_policy_severity(d),
 		}),
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }
 
-force_push_policy_kind = "force_push_policy"
+force_push_policy_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 1
+
+force_push_policy_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
+
+force_push_policy_kind = "github_force_push_policy"
 
 force_push_policy_header(h) = x {
 	x := {
 		"api_version": "decision.api.shisho.dev/v1beta",
 		"kind": force_push_policy_kind,
 		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:ssc/category": "source",
@@ -588,22 +432,10 @@ force_push_policy_header(h) = x {
 }
 
 # METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:force_push_policy"
-# scope: "rule"
-# description: "Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:force_push_policy"
-force_push_policy_entry(report_id, allowed, subject_branch) = x {
-	x := {
-		"severity": 1,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"allowed": allowed, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:force_push_policy"
+# title: "Entry of decision.api.shisho.dev/v1beta:github_force_push_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:force_push_policy
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_force_push_policy
 #
 #   The parameter `data` is an object with the following fields: 
 #   - allowed: boolean
@@ -616,40 +448,8 @@ force_push_policy_entry(report_id, allowed, subject_branch) = x {
 #     "subject_branch": "example",
 #   }
 #   ```
-force_push_policy_entry_v2(report_id, edata) = x {
-	x := {
-		"severity": 1,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:force_push_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:force_push_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-force_push_policy_entry_with_severity(report_id, severity, allowed, subject_branch) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"allowed": allowed, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:force_push_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:force_push_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-force_push_policy_entry_v2_with_severity(report_id, severity, edata) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
+force_push_policy_payload(edata) = x {
+	x := json.marshal(edata)
 }
 
 # @title Ensure linear history is required
@@ -659,55 +459,59 @@ force_push_policy_entry_v2_with_severity(report_id, severity, edata) = x {
 # import data.shisho
 # 
 # decisions[d] {
-#   # the target of the decision (e.g. a GitHub repository, etc.)
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
 #
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   # See the following for further information:
-#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
-#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
-#   policyReportId := "..."
-#
-#   # evidence for the decision
-#   entries := [
-#     shisho.decision.github.linear_history_policy_entry_v2(policyReportId, {
-#       "required": false,
-#       "subject_branch": "example",
-#     }),
-#   ]
-#
 #   d := shisho.decision.github.linear_history_policy({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "entries": entries,
+#     "payload": shisho.decision.github.linear_history_policy_payload({
+#       "required": false,
+#       "subject_branch": "example",
+#     }),
 #   })
 # }
 # ```
 
 # METADATA
-# title: "decision.api.shisho.dev/v1beta:linear_history_policy"
+# title: "decision.api.shisho.dev/v1beta:github_linear_history_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:linear_history_policy".
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_linear_history_policy".
 linear_history_policy(d) = x {
 	x := {
 		"header": linear_history_policy_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
+			"locator": linear_history_policy_locator(d),
+			"severity": linear_history_policy_severity(d),
 		}),
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }
 
-linear_history_policy_kind = "linear_history_policy"
+linear_history_policy_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 0
+
+linear_history_policy_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
+
+linear_history_policy_kind = "github_linear_history_policy"
 
 linear_history_policy_header(h) = x {
 	x := {
 		"api_version": "decision.api.shisho.dev/v1beta",
 		"kind": linear_history_policy_kind,
 		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:ssc/category": "source",
@@ -718,22 +522,10 @@ linear_history_policy_header(h) = x {
 }
 
 # METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:linear_history_policy"
-# scope: "rule"
-# description: "Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:linear_history_policy"
-linear_history_policy_entry(report_id, required, subject_branch) = x {
-	x := {
-		"severity": 0,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"required": required, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:linear_history_policy"
+# title: "Entry of decision.api.shisho.dev/v1beta:github_linear_history_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:linear_history_policy
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_linear_history_policy
 #
 #   The parameter `data` is an object with the following fields: 
 #   - required: boolean
@@ -746,40 +538,8 @@ linear_history_policy_entry(report_id, required, subject_branch) = x {
 #     "subject_branch": "example",
 #   }
 #   ```
-linear_history_policy_entry_v2(report_id, edata) = x {
-	x := {
-		"severity": 0,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:linear_history_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:linear_history_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-linear_history_policy_entry_with_severity(report_id, severity, required, subject_branch) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"required": required, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:linear_history_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:linear_history_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-linear_history_policy_entry_v2_with_severity(report_id, severity, edata) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
+linear_history_policy_payload(edata) = x {
+	x := json.marshal(edata)
 }
 
 # @title Ensure any change to code receives the enough number of approvals by authenticated users
@@ -789,55 +549,59 @@ linear_history_policy_entry_v2_with_severity(report_id, severity, edata) = x {
 # import data.shisho
 # 
 # decisions[d] {
-#   # the target of the decision (e.g. a GitHub repository, etc.)
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
 #
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   # See the following for further information:
-#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
-#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
-#   policyReportId := "..."
-#
-#   # evidence for the decision
-#   entries := [
-#     shisho.decision.github.minimum_approval_number_policy_entry_v2(policyReportId, {
-#       "required_approval_count": 0,
-#       "subject_branch": "example",
-#     }),
-#   ]
-#
 #   d := shisho.decision.github.minimum_approval_number_policy({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "entries": entries,
+#     "payload": shisho.decision.github.minimum_approval_number_policy_payload({
+#       "required_approval_count": 0,
+#       "subject_branch": "example",
+#     }),
 #   })
 # }
 # ```
 
 # METADATA
-# title: "decision.api.shisho.dev/v1beta:minimum_approval_number_policy"
+# title: "decision.api.shisho.dev/v1beta:github_minimum_approval_number_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:minimum_approval_number_policy".
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_minimum_approval_number_policy".
 minimum_approval_number_policy(d) = x {
 	x := {
 		"header": minimum_approval_number_policy_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
+			"locator": minimum_approval_number_policy_locator(d),
+			"severity": minimum_approval_number_policy_severity(d),
 		}),
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }
 
-minimum_approval_number_policy_kind = "minimum_approval_number_policy"
+minimum_approval_number_policy_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 2
+
+minimum_approval_number_policy_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
+
+minimum_approval_number_policy_kind = "github_minimum_approval_number_policy"
 
 minimum_approval_number_policy_header(h) = x {
 	x := {
 		"api_version": "decision.api.shisho.dev/v1beta",
 		"kind": minimum_approval_number_policy_kind,
 		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:ssc/category": "source",
@@ -848,22 +612,10 @@ minimum_approval_number_policy_header(h) = x {
 }
 
 # METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:minimum_approval_number_policy"
-# scope: "rule"
-# description: "Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:minimum_approval_number_policy"
-minimum_approval_number_policy_entry(report_id, required_approval_count, subject_branch) = x {
-	x := {
-		"severity": 2,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"required_approval_count": required_approval_count, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:minimum_approval_number_policy"
+# title: "Entry of decision.api.shisho.dev/v1beta:github_minimum_approval_number_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:minimum_approval_number_policy
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_minimum_approval_number_policy
 #
 #   The parameter `data` is an object with the following fields: 
 #   - required_approval_count: number
@@ -876,40 +628,8 @@ minimum_approval_number_policy_entry(report_id, required_approval_count, subject
 #     "subject_branch": "example",
 #   }
 #   ```
-minimum_approval_number_policy_entry_v2(report_id, edata) = x {
-	x := {
-		"severity": 2,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:minimum_approval_number_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:minimum_approval_number_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-minimum_approval_number_policy_entry_with_severity(report_id, severity, required_approval_count, subject_branch) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"required_approval_count": required_approval_count, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:minimum_approval_number_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:minimum_approval_number_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-minimum_approval_number_policy_entry_v2_with_severity(report_id, severity, edata) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
+minimum_approval_number_policy_payload(edata) = x {
+	x := json.marshal(edata)
 }
 
 # @title Ensure branch protection rules are enforced for administrators
@@ -919,55 +639,59 @@ minimum_approval_number_policy_entry_v2_with_severity(report_id, severity, edata
 # import data.shisho
 # 
 # decisions[d] {
-#   # the target of the decision (e.g. a GitHub repository, etc.)
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
 #
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   # See the following for further information:
-#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
-#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
-#   policyReportId := "..."
-#
-#   # evidence for the decision
-#   entries := [
-#     shisho.decision.github.protection_enforcement_for_admins_entry_v2(policyReportId, {
-#       "allowed": false,
-#       "subject_branch": "example",
-#     }),
-#   ]
-#
 #   d := shisho.decision.github.protection_enforcement_for_admins({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "entries": entries,
+#     "payload": shisho.decision.github.protection_enforcement_for_admins_payload({
+#       "allowed": false,
+#       "subject_branch": "example",
+#     }),
 #   })
 # }
 # ```
 
 # METADATA
-# title: "decision.api.shisho.dev/v1beta:protection_enforcement_for_admins"
+# title: "decision.api.shisho.dev/v1beta:github_protection_enforcement_for_admins"
 # scope: "rule"
 # description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:protection_enforcement_for_admins".
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_protection_enforcement_for_admins".
 protection_enforcement_for_admins(d) = x {
 	x := {
 		"header": protection_enforcement_for_admins_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
+			"locator": protection_enforcement_for_admins_locator(d),
+			"severity": protection_enforcement_for_admins_severity(d),
 		}),
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }
 
-protection_enforcement_for_admins_kind = "protection_enforcement_for_admins"
+protection_enforcement_for_admins_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 1
+
+protection_enforcement_for_admins_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
+
+protection_enforcement_for_admins_kind = "github_protection_enforcement_for_admins"
 
 protection_enforcement_for_admins_header(h) = x {
 	x := {
 		"api_version": "decision.api.shisho.dev/v1beta",
 		"kind": protection_enforcement_for_admins_kind,
 		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:ssc/category": "source",
@@ -978,22 +702,10 @@ protection_enforcement_for_admins_header(h) = x {
 }
 
 # METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:protection_enforcement_for_admins"
-# scope: "rule"
-# description: "Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:protection_enforcement_for_admins"
-protection_enforcement_for_admins_entry(report_id, allowed, subject_branch) = x {
-	x := {
-		"severity": 1,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"allowed": allowed, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:protection_enforcement_for_admins"
+# title: "Entry of decision.api.shisho.dev/v1beta:github_protection_enforcement_for_admins"
 # scope: "rule"
 # description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:protection_enforcement_for_admins
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_protection_enforcement_for_admins
 #
 #   The parameter `data` is an object with the following fields: 
 #   - allowed: boolean
@@ -1006,40 +718,8 @@ protection_enforcement_for_admins_entry(report_id, allowed, subject_branch) = x 
 #     "subject_branch": "example",
 #   }
 #   ```
-protection_enforcement_for_admins_entry_v2(report_id, edata) = x {
-	x := {
-		"severity": 1,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:protection_enforcement_for_admins"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:protection_enforcement_for_admins with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-protection_enforcement_for_admins_entry_with_severity(report_id, severity, allowed, subject_branch) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"allowed": allowed, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:protection_enforcement_for_admins"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:protection_enforcement_for_admins with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-protection_enforcement_for_admins_entry_v2_with_severity(report_id, severity, edata) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
+protection_enforcement_for_admins_payload(edata) = x {
+	x := json.marshal(edata)
 }
 
 # @title Ensure minimum number of administrators are set for the GitHub repository
@@ -1049,54 +729,58 @@ protection_enforcement_for_admins_entry_v2_with_severity(report_id, severity, ed
 # import data.shisho
 # 
 # decisions[d] {
-#   # the target of the decision (e.g. a GitHub repository, etc.)
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
 #
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   # See the following for further information:
-#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
-#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
-#   policyReportId := "..."
-#
-#   # evidence for the decision
-#   entries := [
-#     shisho.decision.github.repo_admins_entry_v2(policyReportId, {
-#       "admins": ["example"],
-#     }),
-#   ]
-#
 #   d := shisho.decision.github.repo_admins({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "entries": entries,
+#     "payload": shisho.decision.github.repo_admins_payload({
+#       "admins": ["example"],
+#     }),
 #   })
 # }
 # ```
 
 # METADATA
-# title: "decision.api.shisho.dev/v1beta:repo_admins"
+# title: "decision.api.shisho.dev/v1beta:github_repo_admins"
 # scope: "rule"
 # description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:repo_admins".
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_repo_admins".
 repo_admins(d) = x {
 	x := {
 		"header": repo_admins_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
+			"locator": repo_admins_locator(d),
+			"severity": repo_admins_severity(d),
 		}),
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }
 
-repo_admins_kind = "repo_admins"
+repo_admins_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 1
+
+repo_admins_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
+
+repo_admins_kind = "github_repo_admins"
 
 repo_admins_header(h) = x {
 	x := {
 		"api_version": "decision.api.shisho.dev/v1beta",
 		"kind": repo_admins_kind,
 		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:ssc/category": "common",
@@ -1107,22 +791,10 @@ repo_admins_header(h) = x {
 }
 
 # METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:repo_admins"
-# scope: "rule"
-# description: "Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:repo_admins"
-repo_admins_entry(report_id, admins) = x {
-	x := {
-		"severity": 1,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"admins": admins}),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:repo_admins"
+# title: "Entry of decision.api.shisho.dev/v1beta:github_repo_admins"
 # scope: "rule"
 # description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:repo_admins
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_repo_admins
 #
 #   The parameter `data` is an object with the following fields: 
 #   - admins: string
@@ -1133,40 +805,8 @@ repo_admins_entry(report_id, admins) = x {
 #     "admins": ["example"],
 #   }
 #   ```
-repo_admins_entry_v2(report_id, edata) = x {
-	x := {
-		"severity": 1,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:repo_admins"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:repo_admins with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-repo_admins_entry_with_severity(report_id, severity, admins) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"admins": admins}),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:repo_admins"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:repo_admins with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-repo_admins_entry_v2_with_severity(report_id, severity, edata) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
+repo_admins_payload(edata) = x {
+	x := json.marshal(edata)
 }
 
 # @title Ensure deletion of GitHub repositories is restricted
@@ -1176,54 +816,58 @@ repo_admins_entry_v2_with_severity(report_id, severity, edata) = x {
 # import data.shisho
 # 
 # decisions[d] {
-#   # the target of the decision (e.g. a GitHub repository, etc.)
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
 #
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   # See the following for further information:
-#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
-#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
-#   policyReportId := "..."
-#
-#   # evidence for the decision
-#   entries := [
-#     shisho.decision.github.repo_members_permission_on_deleting_repository_entry_v2(policyReportId, {
-#       "allowed_users": ["example"],
-#     }),
-#   ]
-#
 #   d := shisho.decision.github.repo_members_permission_on_deleting_repository({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "entries": entries,
+#     "payload": shisho.decision.github.repo_members_permission_on_deleting_repository_payload({
+#       "allowed_users": ["example"],
+#     }),
 #   })
 # }
 # ```
 
 # METADATA
-# title: "decision.api.shisho.dev/v1beta:repo_members_permission_on_deleting_repository"
+# title: "decision.api.shisho.dev/v1beta:github_repo_members_permission_on_deleting_repository"
 # scope: "rule"
 # description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:repo_members_permission_on_deleting_repository".
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_repo_members_permission_on_deleting_repository".
 repo_members_permission_on_deleting_repository(d) = x {
 	x := {
 		"header": repo_members_permission_on_deleting_repository_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
+			"locator": repo_members_permission_on_deleting_repository_locator(d),
+			"severity": repo_members_permission_on_deleting_repository_severity(d),
 		}),
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }
 
-repo_members_permission_on_deleting_repository_kind = "repo_members_permission_on_deleting_repository"
+repo_members_permission_on_deleting_repository_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 1
+
+repo_members_permission_on_deleting_repository_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
+
+repo_members_permission_on_deleting_repository_kind = "github_repo_members_permission_on_deleting_repository"
 
 repo_members_permission_on_deleting_repository_header(h) = x {
 	x := {
 		"api_version": "decision.api.shisho.dev/v1beta",
 		"kind": repo_members_permission_on_deleting_repository_kind,
 		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:ssc/category": "source",
@@ -1234,22 +878,10 @@ repo_members_permission_on_deleting_repository_header(h) = x {
 }
 
 # METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:repo_members_permission_on_deleting_repository"
-# scope: "rule"
-# description: "Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:repo_members_permission_on_deleting_repository"
-repo_members_permission_on_deleting_repository_entry(report_id, allowed_users) = x {
-	x := {
-		"severity": 1,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"allowed_users": allowed_users}),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:repo_members_permission_on_deleting_repository"
+# title: "Entry of decision.api.shisho.dev/v1beta:github_repo_members_permission_on_deleting_repository"
 # scope: "rule"
 # description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:repo_members_permission_on_deleting_repository
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_repo_members_permission_on_deleting_repository
 #
 #   The parameter `data` is an object with the following fields: 
 #   - allowed_users: string
@@ -1260,40 +892,8 @@ repo_members_permission_on_deleting_repository_entry(report_id, allowed_users) =
 #     "allowed_users": ["example"],
 #   }
 #   ```
-repo_members_permission_on_deleting_repository_entry_v2(report_id, edata) = x {
-	x := {
-		"severity": 1,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:repo_members_permission_on_deleting_repository"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:repo_members_permission_on_deleting_repository with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-repo_members_permission_on_deleting_repository_entry_with_severity(report_id, severity, allowed_users) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"allowed_users": allowed_users}),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:repo_members_permission_on_deleting_repository"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:repo_members_permission_on_deleting_repository with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-repo_members_permission_on_deleting_repository_entry_v2_with_severity(report_id, severity, edata) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
+repo_members_permission_on_deleting_repository_payload(edata) = x {
+	x := json.marshal(edata)
 }
 
 # @title Ensure previous approvals are dismissed when updates are introduced to a code change proposal
@@ -1303,55 +903,59 @@ repo_members_permission_on_deleting_repository_entry_v2_with_severity(report_id,
 # import data.shisho
 # 
 # decisions[d] {
-#   # the target of the decision (e.g. a GitHub repository, etc.)
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
 #
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   # See the following for further information:
-#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
-#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
-#   policyReportId := "..."
-#
-#   # evidence for the decision
-#   entries := [
-#     shisho.decision.github.stale_review_policy_entry_v2(policyReportId, {
-#       "enforced": false,
-#       "subject_branch": "example",
-#     }),
-#   ]
-#
 #   d := shisho.decision.github.stale_review_policy({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "entries": entries,
+#     "payload": shisho.decision.github.stale_review_policy_payload({
+#       "enforced": false,
+#       "subject_branch": "example",
+#     }),
 #   })
 # }
 # ```
 
 # METADATA
-# title: "decision.api.shisho.dev/v1beta:stale_review_policy"
+# title: "decision.api.shisho.dev/v1beta:github_stale_review_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:stale_review_policy".
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_stale_review_policy".
 stale_review_policy(d) = x {
 	x := {
 		"header": stale_review_policy_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
+			"locator": stale_review_policy_locator(d),
+			"severity": stale_review_policy_severity(d),
 		}),
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }
 
-stale_review_policy_kind = "stale_review_policy"
+stale_review_policy_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 1
+
+stale_review_policy_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
+
+stale_review_policy_kind = "github_stale_review_policy"
 
 stale_review_policy_header(h) = x {
 	x := {
 		"api_version": "decision.api.shisho.dev/v1beta",
 		"kind": stale_review_policy_kind,
 		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:ssc/category": "source",
@@ -1362,22 +966,10 @@ stale_review_policy_header(h) = x {
 }
 
 # METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:stale_review_policy"
-# scope: "rule"
-# description: "Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:stale_review_policy"
-stale_review_policy_entry(report_id, enforced, subject_branch) = x {
-	x := {
-		"severity": 1,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"enforced": enforced, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:stale_review_policy"
+# title: "Entry of decision.api.shisho.dev/v1beta:github_stale_review_policy"
 # scope: "rule"
 # description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:stale_review_policy
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_stale_review_policy
 #
 #   The parameter `data` is an object with the following fields: 
 #   - enforced: boolean
@@ -1390,38 +982,6 @@ stale_review_policy_entry(report_id, enforced, subject_branch) = x {
 #     "subject_branch": "example",
 #   }
 #   ```
-stale_review_policy_entry_v2(report_id, edata) = x {
-	x := {
-		"severity": 1,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:stale_review_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:stale_review_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-stale_review_policy_entry_with_severity(report_id, severity, enforced, subject_branch) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"enforced": enforced, "subject_branch": subject_branch}),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:stale_review_policy"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:stale_review_policy with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-stale_review_policy_entry_v2_with_severity(report_id, severity, edata) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
+stale_review_policy_payload(edata) = x {
+	x := json.marshal(edata)
 }

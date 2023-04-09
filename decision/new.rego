@@ -13,10 +13,12 @@ new(d) = x {
 			"api_version": d.api_version,
 			"kind": d.kind,
 			"subject": d.subject,
+			"severity": d.severity,
+			"locator": d.locator,
 			"labels": {},
 			"annotations": {},
 			"type": shisho.decision.as_decision_type(d.allowed),
 		},
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }

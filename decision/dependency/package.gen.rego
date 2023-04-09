@@ -12,35 +12,18 @@ import data.shisho
 # import data.shisho
 # 
 # decisions[d] {
-#   # the target of the decision (e.g. a GitHub repository, etc.)
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
 #
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   # See the following for further information:
-#   # ja: https:/shisho.dev/docs/g/api/graphql-schema
-#   # en: https:/shisho.dev/docs/ja/g/api/graphql-schema
-#   policyReportId := "..."
-#
-#   # evidence for the decision
-#   entries := [
-#     shisho.decision.dependency.package_known_vulnerability_entry_v2(policyReportId, {
-#       "advisories": ["example"],
-#       "description": "example",
-#       "found_at": "example",
-#       "name": "example",
-#       "version": "example",
-#       "vuln_constraint": "example",
-#       "vuln_id": "example",
-#       "vuln_namespace": "example",
-#     }),
-#   ]
-#
 #   d := shisho.decision.dependency.package_known_vulnerability({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "entries": entries,
+#     "payload": shisho.decision.dependency.package_known_vulnerability_payload({
+#       "vulnerabilities": [{"name": "example", "version": "example", "vuln_constraint": "example", "vuln_id": "example", "vuln_namespace": "example", "advisories": ["example"], "description": "example", "found_at": "example"}],
+#     }),
 #   })
 # }
 # ```
@@ -55,10 +38,22 @@ package_known_vulnerability(d) = x {
 		"header": package_known_vulnerability_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
+			"locator": package_known_vulnerability_locator(d),
+			"severity": package_known_vulnerability_severity(d),
 		}),
-		"entries": d.entries,
+		"payload": d.payload,
 	}
 }
+
+package_known_vulnerability_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 0
+
+package_known_vulnerability_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
 
 package_known_vulnerability_kind = "package_known_vulnerability"
 
@@ -67,6 +62,8 @@ package_known_vulnerability_header(h) = x {
 		"api_version": "decision.api.shisho.dev/v1beta",
 		"kind": package_known_vulnerability_kind,
 		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:ssc/category": "dependency",
@@ -79,76 +76,18 @@ package_known_vulnerability_header(h) = x {
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:package_known_vulnerability"
 # scope: "rule"
-# description: "Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:package_known_vulnerability"
-package_known_vulnerability_entry(report_id, advisories, description, found_at, name, version, vuln_constraint, vuln_id, vuln_namespace) = x {
-	x := {
-		"severity": 0,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"advisories": advisories, "description": description, "found_at": found_at, "name": name, "version": version, "vuln_constraint": vuln_constraint, "vuln_id": vuln_id, "vuln_namespace": vuln_namespace}),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:package_known_vulnerability"
-# scope: "rule"
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:package_known_vulnerability
 #
 #   The parameter `data` is an object with the following fields: 
-#   - advisories: string
-#   - description: string
-#   - found_at: string
-#   - name: string
-#   - version: string
-#   - vuln_constraint: string
-#   - vuln_id: string
-#   - vuln_namespace: string
+#   - vulnerabilities: {"name": string, "version": string, "vuln_constraint": string, "vuln_id": string, "vuln_namespace": string, "advisories": string, "description": string, "found_at": string}
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "advisories": ["example"],
-#     "description": "example",
-#     "found_at": "example",
-#     "name": "example",
-#     "version": "example",
-#     "vuln_constraint": "example",
-#     "vuln_id": "example",
-#     "vuln_namespace": "example",
+#     "vulnerabilities": [{"name": "example", "version": "example", "vuln_constraint": "example", "vuln_id": "example", "vuln_namespace": "example", "advisories": ["example"], "description": "example", "found_at": "example"}],
 #   }
 #   ```
-package_known_vulnerability_entry_v2(report_id, edata) = x {
-	x := {
-		"severity": 0,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:package_known_vulnerability"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:package_known_vulnerability with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-package_known_vulnerability_entry_with_severity(report_id, severity, advisories, description, found_at, name, version, vuln_constraint, vuln_id, vuln_namespace) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal({"advisories": advisories, "description": description, "found_at": found_at, "name": name, "version": version, "vuln_constraint": vuln_constraint, "vuln_id": vuln_id, "vuln_namespace": vuln_namespace}),
-	}
-}
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:package_known_vulnerability"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:package_known_vulnerability with a specified severity.
-#   Visit decision/decision.rego to see all the severities.
-package_known_vulnerability_entry_v2_with_severity(report_id, severity, edata) = x {
-	x := {
-		"severity": severity,
-		"resource_id": shisho.decision.as_resource_id(report_id),
-		"data": json.marshal(edata),
-	}
+package_known_vulnerability_payload(edata) = x {
+	x := json.marshal(edata)
 }

@@ -70,9 +70,16 @@ instance_accessibility_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_accessibility_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_accessibility_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:aws_rds_instance_accessibility"
@@ -158,9 +165,16 @@ instance_auto_upgrade_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_auto_upgrade_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_auto_upgrade_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:aws_rds_instance_auto_upgrade"
@@ -246,9 +260,16 @@ instance_encryption_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_encryption_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_encryption_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:aws_rds_instance_encryption"

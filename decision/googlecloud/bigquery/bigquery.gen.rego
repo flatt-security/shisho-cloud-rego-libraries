@@ -50,7 +50,7 @@ dataset_accessibility_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 3
+} else := 4
 
 dataset_accessibility_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -71,9 +71,16 @@ dataset_accessibility_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(dataset_accessibility_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+dataset_accessibility_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_bigquery_dataset_accessibility"
@@ -114,6 +121,7 @@ dataset_accessibility_payload(edata) = x {
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.bigquery.dataset_encryption_cmek_payload({
 #       "key_name": "example",
+#       "uses_default_key": false,
 #     }),
 #   })
 # }
@@ -140,7 +148,7 @@ dataset_encryption_cmek_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 1
+} else := 0
 
 dataset_encryption_cmek_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -161,9 +169,16 @@ dataset_encryption_cmek_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(dataset_encryption_cmek_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+dataset_encryption_cmek_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_bigquery_dataset_encryption_cmek"
@@ -173,11 +188,13 @@ dataset_encryption_cmek_header(h) = x {
 #
 #   The parameter `data` is an object with the following fields: 
 #   - key_name: string
+#   - uses_default_key: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
 #     "key_name": "example",
+#     "uses_default_key": false,
 #   }
 #   ```
 dataset_encryption_cmek_payload(edata) = x {
@@ -202,7 +219,7 @@ dataset_encryption_cmek_payload(edata) = x {
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.bigquery.table_encryption_cmek_payload({
 #       "key_name": "example",
-#       "table_name": "example",
+#       "uses_default_key": false,
 #     }),
 #   })
 # }
@@ -229,7 +246,7 @@ table_encryption_cmek_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 1
+} else := 0
 
 table_encryption_cmek_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -250,9 +267,16 @@ table_encryption_cmek_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(table_encryption_cmek_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+table_encryption_cmek_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_bigquery_table_encryption_cmek"
@@ -262,13 +286,13 @@ table_encryption_cmek_header(h) = x {
 #
 #   The parameter `data` is an object with the following fields: 
 #   - key_name: string
-#   - table_name: string
+#   - uses_default_key: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
 #     "key_name": "example",
-#     "table_name": "example",
+#     "uses_default_key": false,
 #   }
 #   ```
 table_encryption_cmek_payload(edata) = x {

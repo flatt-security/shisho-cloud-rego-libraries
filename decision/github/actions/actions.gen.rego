@@ -69,9 +69,16 @@ dependency_pinning_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "dependency",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "2.4.2",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(dependency_pinning_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+dependency_pinning_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_actions_dependency_pinning"
@@ -156,9 +163,16 @@ insecure_script_evaluation_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "common",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "2.4.3",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(insecure_script_evaluation_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+insecure_script_evaluation_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_actions_insecure_script_evaluation"
@@ -243,9 +257,16 @@ workflow_explicit_permissions_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "common",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "2.2.3",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(workflow_explicit_permissions_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+workflow_explicit_permissions_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_actions_workflow_explicit_permissions"
@@ -330,9 +351,16 @@ workflow_script_injection_possibility_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "common",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.3.8",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(workflow_script_injection_possibility_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+workflow_script_injection_possibility_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_actions_workflow_script_injection_possibility"
@@ -417,9 +445,16 @@ workflow_secret_handling_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "common",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.5.1",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(workflow_secret_handling_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+workflow_secret_handling_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_actions_workflow_secret_handling"

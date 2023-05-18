@@ -70,9 +70,16 @@ audit_configuration_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(audit_configuration_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+audit_configuration_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_monitoring_audit_configuration"
@@ -158,9 +165,16 @@ custom_role_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(custom_role_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+custom_role_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_monitoring_custom_role"
@@ -246,9 +260,16 @@ firewall_rule_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(firewall_rule_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+firewall_rule_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_monitoring_firewall_rule"
@@ -334,9 +355,16 @@ network_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(network_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+network_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_monitoring_network"
@@ -422,9 +450,16 @@ network_route_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(network_route_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+network_route_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_monitoring_network_route"
@@ -510,9 +545,16 @@ project_ownership_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(project_ownership_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+project_ownership_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_monitoring_project_ownership"
@@ -598,9 +640,16 @@ sql_instance_configuration_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(sql_instance_configuration_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+sql_instance_configuration_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_monitoring_sql_instance_configuration"
@@ -686,9 +735,16 @@ storage_iam_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(storage_iam_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+storage_iam_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_monitoring_storage_iam"

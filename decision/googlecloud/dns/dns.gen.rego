@@ -22,7 +22,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.dns.dnssec_payload({
-#       "enabled": false,
+#       "dnssec_enabled": false,
 #     }),
 #   })
 # }
@@ -70,9 +70,16 @@ dnssec_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(dnssec_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+dnssec_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_dns_dnssec"
@@ -81,12 +88,12 @@ dnssec_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_dns_dnssec
 #
 #   The parameter `data` is an object with the following fields: 
-#   - enabled: boolean
+#   - dnssec_enabled: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "enabled": false,
+#     "dnssec_enabled": false,
 #   }
 #   ```
 dnssec_payload(edata) = x {
@@ -158,9 +165,16 @@ dnssec_ksk_algorithm_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(dnssec_ksk_algorithm_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+dnssec_ksk_algorithm_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_dns_dnssec_ksk_algorithm"
@@ -246,9 +260,16 @@ dnssec_zsk_algorithm_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(dnssec_zsk_algorithm_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+dnssec_zsk_algorithm_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_dns_dnssec_zsk_algorithm"

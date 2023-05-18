@@ -69,9 +69,16 @@ administrative_policy_limitation_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(administrative_policy_limitation_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+administrative_policy_limitation_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:aws_iam_administrative_policy_limitation"
@@ -150,9 +157,16 @@ credentials_inventory_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(credentials_inventory_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+credentials_inventory_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:aws_iam_credentials_inventory"
@@ -241,9 +255,16 @@ key_rotation_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(key_rotation_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+key_rotation_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:aws_iam_key_rotation"
@@ -332,9 +353,16 @@ password_length_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(password_length_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+password_length_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:aws_iam_password_length"
@@ -423,9 +451,16 @@ password_reuse_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(password_reuse_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+password_reuse_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:aws_iam_password_reuse"
@@ -513,9 +548,16 @@ root_user_hardware_mfa_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(root_user_hardware_mfa_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+root_user_hardware_mfa_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:aws_iam_root_user_hardware_mfa"
@@ -601,9 +643,16 @@ root_user_key_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(root_user_key_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+root_user_key_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:aws_iam_root_user_key"
@@ -689,9 +738,16 @@ root_user_mfa_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(root_user_mfa_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+root_user_mfa_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:aws_iam_root_user_mfa"
@@ -777,9 +833,16 @@ root_user_usage_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(root_user_usage_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+root_user_usage_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:aws_iam_root_user_usage"

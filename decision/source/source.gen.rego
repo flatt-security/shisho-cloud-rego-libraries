@@ -69,9 +69,16 @@ version_control_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "source",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.1.1",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(version_control_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+version_control_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:version_control"

@@ -69,9 +69,16 @@ package_known_vulnerability_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "dependency",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "3.2.2",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(package_known_vulnerability_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+package_known_vulnerability_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:package_known_vulnerability"

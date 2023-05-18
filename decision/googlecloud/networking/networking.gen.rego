@@ -22,7 +22,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.networking.default_network_payload({
-#       "exists": false,
+#       "default_network_exists": false,
 #     }),
 #   })
 # }
@@ -49,7 +49,7 @@ default_network_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 1
+} else := 0
 
 default_network_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -70,9 +70,16 @@ default_network_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(default_network_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+default_network_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_networking_default_network"
@@ -81,12 +88,12 @@ default_network_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_networking_default_network
 #
 #   The parameter `data` is an object with the following fields: 
-#   - exists: boolean
+#   - default_network_exists: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "exists": false,
+#     "default_network_exists": false,
 #   }
 #   ```
 default_network_payload(edata) = x {
@@ -110,7 +117,7 @@ default_network_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.networking.dns_log_payload({
-#       "enabled": false,
+#       "log_enabled": false,
 #     }),
 #   })
 # }
@@ -158,9 +165,16 @@ dns_log_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(dns_log_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+dns_log_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_networking_dns_log"
@@ -169,12 +183,12 @@ dns_log_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_networking_dns_log
 #
 #   The parameter `data` is an object with the following fields: 
-#   - enabled: boolean
+#   - log_enabled: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "enabled": false,
+#     "log_enabled": false,
 #   }
 #   ```
 dns_log_payload(edata) = x {
@@ -198,7 +212,7 @@ dns_log_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.networking.proxy_tls_policy_payload({
-#       "enabled": false,
+#       "tls_policy_attached": false,
 #     }),
 #   })
 # }
@@ -246,9 +260,16 @@ proxy_tls_policy_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(proxy_tls_policy_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+proxy_tls_policy_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_networking_proxy_tls_policy"
@@ -257,12 +278,12 @@ proxy_tls_policy_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_networking_proxy_tls_policy
 #
 #   The parameter `data` is an object with the following fields: 
-#   - enabled: boolean
+#   - tls_policy_attached: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "enabled": false,
+#     "tls_policy_attached": false,
 #   }
 #   ```
 proxy_tls_policy_payload(edata) = x {
@@ -286,7 +307,7 @@ proxy_tls_policy_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.networking.rdp_access_payload({
-#       "exposed_surfaces": [{"ip_address": "example", "port": "example", "subnetwork_self_link": "example"}],
+#       "exposed_surfaces": [{"network_self_link": "example"}],
 #     }),
 #   })
 # }
@@ -334,9 +355,16 @@ rdp_access_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(rdp_access_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+rdp_access_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_networking_rdp_access"
@@ -345,12 +373,12 @@ rdp_access_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_networking_rdp_access
 #
 #   The parameter `data` is an object with the following fields: 
-#   - exposed_surfaces: {"ip_address": string, "port": string, "subnetwork_self_link": string}
+#   - exposed_surfaces: {"network_self_link": string}
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "exposed_surfaces": [{"ip_address": "example", "port": "example", "subnetwork_self_link": "example"}],
+#     "exposed_surfaces": [{"network_self_link": "example"}],
 #   }
 #   ```
 rdp_access_payload(edata) = x {
@@ -374,7 +402,7 @@ rdp_access_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.networking.ssh_access_payload({
-#       "exposed_surfaces": [{"ip_address": "example", "port": "example", "subnetwork_self_link": "example"}],
+#       "exposed_surfaces": [{"network_self_link": "example"}],
 #     }),
 #   })
 # }
@@ -422,9 +450,16 @@ ssh_access_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(ssh_access_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+ssh_access_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_networking_ssh_access"
@@ -433,12 +468,12 @@ ssh_access_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_networking_ssh_access
 #
 #   The parameter `data` is an object with the following fields: 
-#   - exposed_surfaces: {"ip_address": string, "port": string, "subnetwork_self_link": string}
+#   - exposed_surfaces: {"network_self_link": string}
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "exposed_surfaces": [{"ip_address": "example", "port": "example", "subnetwork_self_link": "example"}],
+#     "exposed_surfaces": [{"network_self_link": "example"}],
 #   }
 #   ```
 ssh_access_payload(edata) = x {
@@ -462,7 +497,7 @@ ssh_access_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.networking.vpc_flow_log_payload({
-#       "enabled": false,
+#       "flow_log_enabled": false,
 #     }),
 #   })
 # }
@@ -489,7 +524,7 @@ vpc_flow_log_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 1
+} else := 2
 
 vpc_flow_log_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -510,9 +545,16 @@ vpc_flow_log_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(vpc_flow_log_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+vpc_flow_log_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_networking_vpc_flow_log"
@@ -521,12 +563,12 @@ vpc_flow_log_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_networking_vpc_flow_log
 #
 #   The parameter `data` is an object with the following fields: 
-#   - enabled: boolean
+#   - flow_log_enabled: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "enabled": false,
+#     "flow_log_enabled": false,
 #   }
 #   ```
 vpc_flow_log_payload(edata) = x {

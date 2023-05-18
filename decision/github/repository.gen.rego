@@ -70,9 +70,16 @@ branch_deletion_policy_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "source",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.1.17",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(branch_deletion_policy_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+branch_deletion_policy_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_branch_deletion_policy"
@@ -160,9 +167,16 @@ code_owners_review_policy_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "source",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.1.7",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(code_owners_review_policy_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+code_owners_review_policy_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_code_owners_review_policy"
@@ -250,9 +264,16 @@ commit_signature_policy_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "source",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.1.12",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(commit_signature_policy_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+commit_signature_policy_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_commit_signature_policy"
@@ -339,9 +360,16 @@ default_branch_protection_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "source",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.1.14",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(default_branch_protection_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+default_branch_protection_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_default_branch_protection"
@@ -427,9 +455,16 @@ force_push_policy_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "source",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.1.16",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(force_push_policy_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+force_push_policy_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_force_push_policy"
@@ -517,9 +552,16 @@ linear_history_policy_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "source",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.1.13",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(linear_history_policy_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+linear_history_policy_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_linear_history_policy"
@@ -607,9 +649,16 @@ minimum_approval_number_policy_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "source",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.1.3",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(minimum_approval_number_policy_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+minimum_approval_number_policy_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_minimum_approval_number_policy"
@@ -697,9 +746,16 @@ protection_enforcement_for_admins_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "source",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.1.14",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(protection_enforcement_for_admins_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+protection_enforcement_for_admins_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_protection_enforcement_for_admins"
@@ -786,9 +842,16 @@ repo_admins_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "common",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.3.7",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(repo_admins_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+repo_admins_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_repo_admins"
@@ -873,9 +936,16 @@ repo_members_permission_on_deleting_repository_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "source",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.2.3",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(repo_members_permission_on_deleting_repository_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+repo_members_permission_on_deleting_repository_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_repo_members_permission_on_deleting_repository"
@@ -961,9 +1031,16 @@ stale_review_policy_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "source",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.1.4",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(stale_review_policy_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+stale_review_policy_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_stale_review_policy"

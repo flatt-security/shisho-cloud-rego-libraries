@@ -22,7 +22,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.compute.disk_encryption_key_payload({
-#       "encryption_key_type": ENCRYPTION_KEY_TYPE_NON_ENCRYPTION_KEY,
+#       "keys": {"target_disk": "example", "key_name": "example", "encryption_key_type": ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_UNKNOWN},
 #     }),
 #   })
 # }
@@ -70,9 +70,16 @@ disk_encryption_key_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(disk_encryption_key_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+disk_encryption_key_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_compute_disk_encryption_key"
@@ -81,12 +88,12 @@ disk_encryption_key_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_compute_disk_encryption_key
 #
 #   The parameter `data` is an object with the following fields: 
-#   - encryption_key_type: encryption_key_type
+#   - keys: {"target_disk": string, "key_name": string, "encryption_key_type": encryption_key_type}
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "encryption_key_type": ENCRYPTION_KEY_TYPE_NON_ENCRYPTION_KEY,
+#     "keys": {"target_disk": "example", "key_name": "example", "encryption_key_type": ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_UNKNOWN},
 #   }
 #   ```
 disk_encryption_key_payload(edata) = x {
@@ -110,7 +117,7 @@ disk_encryption_key_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.compute.instance_ip_forwarding_payload({
-#       "enabled": false,
+#       "forwarding_enabled": false,
 #     }),
 #   })
 # }
@@ -137,7 +144,7 @@ instance_ip_forwarding_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 2
+} else := 3
 
 instance_ip_forwarding_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -158,9 +165,16 @@ instance_ip_forwarding_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_ip_forwarding_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_ip_forwarding_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_compute_instance_ip_forwarding"
@@ -169,19 +183,19 @@ instance_ip_forwarding_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_compute_instance_ip_forwarding
 #
 #   The parameter `data` is an object with the following fields: 
-#   - enabled: boolean
+#   - forwarding_enabled: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "enabled": false,
+#     "forwarding_enabled": false,
 #   }
 #   ```
 instance_ip_forwarding_payload(edata) = x {
 	x := json.marshal(edata)
 }
 
-# @title Ensure that Google Compute Engine instances use appropriate OAuth2 scopes for Google APIs
+# @title Ensure that Compute Engine instances use appropriate OAuth2 scopes for Google APIs
 # You can emit this decision as follows:
 # 
 # ```
@@ -198,8 +212,8 @@ instance_ip_forwarding_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.compute.instance_oauth2_scope_payload({
-#       "scopes": ["example"],
-#       "service_account_name": "example",
+#       "assigned_scopes": ["example"],
+#       "service_account_email": "example",
 #     }),
 #   })
 # }
@@ -226,7 +240,7 @@ instance_oauth2_scope_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 1
+} else := 0
 
 instance_oauth2_scope_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -246,9 +260,16 @@ instance_oauth2_scope_header(h) = x {
 			"decision.api.shisho.dev:googlecloud/cis-benchmark/v1.3.0": "4.2",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_oauth2_scope_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_oauth2_scope_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_compute_instance_oauth2_scope"
@@ -257,14 +278,14 @@ instance_oauth2_scope_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_compute_instance_oauth2_scope
 #
 #   The parameter `data` is an object with the following fields: 
-#   - scopes: string
-#   - service_account_name: string
+#   - assigned_scopes: string
+#   - service_account_email: string
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "scopes": ["example"],
-#     "service_account_name": "example",
+#     "assigned_scopes": ["example"],
+#     "service_account_email": "example",
 #   }
 #   ```
 instance_oauth2_scope_payload(edata) = x {
@@ -288,7 +309,7 @@ instance_oauth2_scope_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.compute.instance_oslogin_payload({
-#       "enabled": false,
+#       "oslogin_enabled": false,
 #     }),
 #   })
 # }
@@ -336,9 +357,16 @@ instance_oslogin_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_oslogin_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_oslogin_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_compute_instance_oslogin"
@@ -347,19 +375,19 @@ instance_oslogin_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_compute_instance_oslogin
 #
 #   The parameter `data` is an object with the following fields: 
-#   - enabled: boolean
+#   - oslogin_enabled: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "enabled": false,
+#     "oslogin_enabled": false,
 #   }
 #   ```
 instance_oslogin_payload(edata) = x {
 	x := json.marshal(edata)
 }
 
-# @title Ensure Google Compute Engine instances block project-wide SSH keys
+# @title Ensure Compute Engine instances block project-wide SSH keys
 # You can emit this decision as follows:
 # 
 # ```
@@ -376,7 +404,8 @@ instance_oslogin_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.compute.instance_project_wide_key_management_payload({
-#       "enabled": false,
+#       "blocked": false,
+#       "project_wide_key_available": false,
 #     }),
 #   })
 # }
@@ -424,9 +453,16 @@ instance_project_wide_key_management_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_project_wide_key_management_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_project_wide_key_management_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_compute_instance_project_wide_key_management"
@@ -435,12 +471,14 @@ instance_project_wide_key_management_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_compute_instance_project_wide_key_management
 #
 #   The parameter `data` is an object with the following fields: 
-#   - enabled: boolean
+#   - blocked: boolean
+#   - project_wide_key_available: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "enabled": false,
+#     "blocked": false,
+#     "project_wide_key_available": false,
 #   }
 #   ```
 instance_project_wide_key_management_payload(edata) = x {
@@ -464,7 +502,8 @@ instance_project_wide_key_management_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.compute.instance_public_ip_payload({
-#       "ip_addresses": ["example"],
+#       "public_ipv4_addresses": ["example"],
+#       "public_ipv6_addresses": ["example"],
 #     }),
 #   })
 # }
@@ -512,9 +551,16 @@ instance_public_ip_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_public_ip_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_public_ip_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_compute_instance_public_ip"
@@ -523,12 +569,14 @@ instance_public_ip_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_compute_instance_public_ip
 #
 #   The parameter `data` is an object with the following fields: 
-#   - ip_addresses: string
+#   - public_ipv4_addresses: string
+#   - public_ipv6_addresses: string
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "ip_addresses": ["example"],
+#     "public_ipv4_addresses": ["example"],
+#     "public_ipv6_addresses": ["example"],
 #   }
 #   ```
 instance_public_ip_payload(edata) = x {
@@ -552,7 +600,7 @@ instance_public_ip_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.compute.instance_serial_port_payload({
-#       "enabled": false,
+#       "serial_port_enabled": false,
 #     }),
 #   })
 # }
@@ -579,7 +627,7 @@ instance_serial_port_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 0
+} else := 2
 
 instance_serial_port_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -600,9 +648,16 @@ instance_serial_port_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_serial_port_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_serial_port_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_compute_instance_serial_port"
@@ -611,19 +666,19 @@ instance_serial_port_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_compute_instance_serial_port
 #
 #   The parameter `data` is an object with the following fields: 
-#   - enabled: boolean
+#   - serial_port_enabled: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "enabled": false,
+#     "serial_port_enabled": false,
 #   }
 #   ```
 instance_serial_port_payload(edata) = x {
 	x := json.marshal(edata)
 }
 
-# @title Ensure that Google Compute Engine instances use service accounts with minimum permissions
+# @title Ensure that Compute Engine instances do not use default service accounts
 # You can emit this decision as follows:
 # 
 # ```
@@ -640,7 +695,8 @@ instance_serial_port_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.compute.instance_service_account_payload({
-#       "service_account_name": "example",
+#       "service_account_email": "example",
+#       "uses_default_account": false,
 #     }),
 #   })
 # }
@@ -687,9 +743,16 @@ instance_service_account_header(h) = x {
 			"decision.api.shisho.dev:googlecloud/cis-benchmark/v1.3.0": "4.1",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_service_account_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_service_account_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_compute_instance_service_account"
@@ -698,12 +761,14 @@ instance_service_account_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_compute_instance_service_account
 #
 #   The parameter `data` is an object with the following fields: 
-#   - service_account_name: string
+#   - service_account_email: string
+#   - uses_default_account: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "service_account_name": "example",
+#     "service_account_email": "example",
+#     "uses_default_account": false,
 #   }
 #   ```
 instance_service_account_payload(edata) = x {
@@ -756,7 +821,7 @@ instance_shielded_vm_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 0
+} else := 2
 
 instance_shielded_vm_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -777,9 +842,16 @@ instance_shielded_vm_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_shielded_vm_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_shielded_vm_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_compute_instance_shielded_vm"
@@ -804,10 +876,12 @@ instance_shielded_vm_payload(edata) = x {
 	x := json.marshal(edata)
 }
 
-ENCRYPTION_KEY_TYPE_NON_ENCRYPTION_KEY = 0
+ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_UNKNOWN = 0
 
-ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_GOOGLE_MANAGED = 1
+ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_NONE = 1
 
-ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_CUSTOMER_MANAGED = 2
+ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_GOOGLE_MANAGED = 2
 
-ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_CUSTOMER_SUPPLIED = 3
+ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_CUSTOMER_MANAGED = 3
+
+ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_CUSTOMER_SUPPLIED = 4

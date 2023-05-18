@@ -5,7 +5,7 @@ package shisho.decision.googlecloud.storage
 
 import data.shisho
 
-# @title Ensure Cloud Storage Bucket accessibility is restricted to a minimum level
+# @title Ensure Cloud Storage buckets are public only if intended
 # You can emit this decision as follows:
 # 
 # ```
@@ -22,10 +22,8 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.storage.bucket_accessibility_payload({
-#       "all_authenticated_users_roles_in_acl_list": ["example"],
-#       "all_authenticated_users_roles_in_iam_policy_list": ["example"],
-#       "all_users_roles_in_acl_list": ["example"],
-#       "all_users_roles_in_iam_policy_list": ["example"],
+#       "public_acl_rules": [{"role": "example", "principal": "example"}],
+#       "public_policy_bindings": [{"role": "example", "principal": "example"}],
 #     }),
 #   })
 # }
@@ -52,7 +50,7 @@ bucket_accessibility_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 3
+} else := 4
 
 bucket_accessibility_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -73,9 +71,16 @@ bucket_accessibility_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(bucket_accessibility_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+bucket_accessibility_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_storage_bucket_accessibility"
@@ -84,18 +89,14 @@ bucket_accessibility_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_storage_bucket_accessibility
 #
 #   The parameter `data` is an object with the following fields: 
-#   - all_authenticated_users_roles_in_acl_list: string
-#   - all_authenticated_users_roles_in_iam_policy_list: string
-#   - all_users_roles_in_acl_list: string
-#   - all_users_roles_in_iam_policy_list: string
+#   - public_acl_rules: {"role": string, "principal": string}
+#   - public_policy_bindings: {"role": string, "principal": string}
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "all_authenticated_users_roles_in_acl_list": ["example"],
-#     "all_authenticated_users_roles_in_iam_policy_list": ["example"],
-#     "all_users_roles_in_acl_list": ["example"],
-#     "all_users_roles_in_iam_policy_list": ["example"],
+#     "public_acl_rules": [{"role": "example", "principal": "example"}],
+#     "public_policy_bindings": [{"role": "example", "principal": "example"}],
 #   }
 #   ```
 bucket_accessibility_payload(edata) = x {
@@ -119,7 +120,7 @@ bucket_accessibility_payload(edata) = x {
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.storage.bucket_uniform_bucket_level_access_payload({
-#       "enabled": false,
+#       "uniform_access_enabled": false,
 #     }),
 #   })
 # }
@@ -146,7 +147,7 @@ bucket_uniform_bucket_level_access_severity(d) := shisho.decision.severity_info 
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 0
+} else := 2
 
 bucket_uniform_bucket_level_access_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -167,9 +168,16 @@ bucket_uniform_bucket_level_access_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(bucket_uniform_bucket_level_access_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+bucket_uniform_bucket_level_access_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_storage_bucket_uniform_bucket_level_access"
@@ -178,12 +186,12 @@ bucket_uniform_bucket_level_access_header(h) = x {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_storage_bucket_uniform_bucket_level_access
 #
 #   The parameter `data` is an object with the following fields: 
-#   - enabled: boolean
+#   - uniform_access_enabled: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "enabled": false,
+#     "uniform_access_enabled": false,
 #   }
 #   ```
 bucket_uniform_bucket_level_access_payload(edata) = x {

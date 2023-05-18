@@ -69,9 +69,16 @@ org_2fa_status_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "common",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.3.5",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(org_2fa_status_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+org_2fa_status_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_org_2fa_status"
@@ -156,9 +163,16 @@ org_default_repository_permission_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "common",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.3.8",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(org_default_repository_permission_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+org_default_repository_permission_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_org_default_repository_permission"
@@ -240,9 +254,16 @@ org_members_permission_on_creating_public_pages_header(h) = x {
 		"severity": h.severity,
 		"labels": {},
 		"annotations": {"decision.api.shisho.dev:ssc/category": "common"},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(org_members_permission_on_creating_public_pages_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+org_members_permission_on_creating_public_pages_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_org_members_permission_on_creating_public_pages"
@@ -327,9 +348,16 @@ org_members_permission_on_creating_public_repos_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "source",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.2.2",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(org_members_permission_on_creating_public_repos_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+org_members_permission_on_creating_public_repos_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_org_members_permission_on_creating_public_repos"
@@ -411,9 +439,16 @@ org_members_permission_on_private_forking_header(h) = x {
 		"severity": h.severity,
 		"labels": {},
 		"annotations": {"decision.api.shisho.dev:ssc/category": "common"},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(org_members_permission_on_private_forking_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+org_members_permission_on_private_forking_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_org_members_permission_on_private_forking"
@@ -498,9 +533,16 @@ org_owners_header(h) = x {
 			"decision.api.shisho.dev:ssc/category": "common",
 			"decision.api.shisho.dev:ssc/cis-benchmark/v1.0": "1.3.3",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(org_owners_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+org_owners_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:github_org_owners"

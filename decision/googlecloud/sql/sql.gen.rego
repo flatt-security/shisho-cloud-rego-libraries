@@ -70,9 +70,16 @@ instance_accessibility_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_accessibility_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_accessibility_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_sql_instance_accessibility"
@@ -137,7 +144,7 @@ instance_backup_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 2
+} else := 3
 
 instance_backup_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -158,9 +165,16 @@ instance_backup_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_backup_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_backup_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_sql_instance_backup"
@@ -225,7 +239,7 @@ instance_connection_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 1
+} else := 2
 
 instance_connection_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -246,9 +260,16 @@ instance_connection_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_connection_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_connection_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_sql_instance_connection"
@@ -334,9 +355,16 @@ instance_public_ip_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(instance_public_ip_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+instance_public_ip_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_sql_instance_public_ip"

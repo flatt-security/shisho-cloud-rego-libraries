@@ -70,9 +70,16 @@ principal_source_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(principal_source_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+principal_source_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_iam_principal_source"
@@ -90,94 +97,6 @@ principal_source_header(h) = x {
 #   }
 #   ```
 principal_source_payload(edata) = x {
-	x := json.marshal(edata)
-}
-
-# @title Ensure a Cloud IAM principal can impersonate or attach only a limited set of service accounts
-# You can emit this decision as follows:
-# 
-# ```
-# import data.shisho
-# 
-# decisions[d] {
-#   # the resource ID to review (e.g. a GitHub repository, etc.)
-#   subject := "test"
-#
-#   # whether the target is allowed by this policy or not
-#   allowed := true
-#
-#   d := shisho.decision.googlecloud.iam.service_account_impersonation({
-#     "allowed": allowed,
-#     "subject": subject,
-#     "payload": shisho.decision.googlecloud.iam.service_account_impersonation_payload({
-#       "violated": [{"from_principal": "example", "to_service_accounts": "example"}],
-#     }),
-#   })
-# }
-# ```
-
-# METADATA
-# title: "decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_impersonation"
-# scope: "rule"
-# description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_impersonation".
-service_account_impersonation(d) = x {
-	x := {
-		"header": service_account_impersonation_header({
-			"allowed": d.allowed,
-			"subject": d.subject,
-			"locator": service_account_impersonation_locator(d),
-			"severity": service_account_impersonation_severity(d),
-		}),
-		"payload": d.payload,
-	}
-}
-
-service_account_impersonation_severity(d) := shisho.decision.severity_info {
-	d.allowed == true
-} else := d.severity {
-	not is_null(d.severity)
-} else := 2
-
-service_account_impersonation_locator(d) := d.locator {
-	not is_null(d.locator)
-} else := ""
-
-service_account_impersonation_kind = "googlecloud_iam_service_account_impersonation"
-
-service_account_impersonation_header(h) = x {
-	x := {
-		"api_version": "decision.api.shisho.dev/v1beta",
-		"kind": service_account_impersonation_kind,
-		"subject": h.subject,
-		"locator": h.locator,
-		"severity": h.severity,
-		"labels": {},
-		"annotations": {
-			"decision.api.shisho.dev:googlecloud/cis-benchmark/v1.3.0": "1.6",
-			"decision.api.shisho.dev:needs-manual-review": "false",
-			"decision.api.shisho.dev:ssc/category": "infrastructure",
-		},
-		"type": shisho.decision.as_decision_type(h.allowed),
-	}
-}
-
-# METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_impersonation"
-# scope: "rule"
-# description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_impersonation
-#
-#   The parameter `data` is an object with the following fields: 
-#   - violated: {"from_principal": string, "to_service_accounts": string}
-#
-#   For instance, `data` can take the following value:
-#   ```rego
-#   {
-#     "violated": [{"from_principal": "example", "to_service_accounts": "example"}],
-#   }
-#   ```
-service_account_impersonation_payload(edata) = x {
 	x := json.marshal(edata)
 }
 
@@ -246,9 +165,16 @@ service_account_key_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(service_account_key_allowed(h)),
 	}
 }
+
+# Force to allow the given decision following resource exception policy
+service_account_key_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
 
 # METADATA
 # title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_key"
@@ -282,49 +208,49 @@ service_account_key_payload(edata) = x {
 #   # whether the target is allowed by this policy or not
 #   allowed := true
 #
-#   d := shisho.decision.googlecloud.iam.service_account_role({
+#   d := shisho.decision.googlecloud.iam.service_account_project_admin_role({
 #     "allowed": allowed,
 #     "subject": subject,
-#     "payload": shisho.decision.googlecloud.iam.service_account_role_payload({
-#       "roles": ["example"],
+#     "payload": shisho.decision.googlecloud.iam.service_account_project_admin_role_payload({
+#       "suspicious_bindings": [{"service_account_email": "example", "role": "example"}],
 #     }),
 #   })
 # }
 # ```
 
 # METADATA
-# title: "decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_role"
+# title: "decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_project_admin_role"
 # scope: "rule"
 # description: |
-#   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_role".
-service_account_role(d) = x {
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_project_admin_role".
+service_account_project_admin_role(d) = x {
 	x := {
-		"header": service_account_role_header({
+		"header": service_account_project_admin_role_header({
 			"allowed": d.allowed,
 			"subject": d.subject,
-			"locator": service_account_role_locator(d),
-			"severity": service_account_role_severity(d),
+			"locator": service_account_project_admin_role_locator(d),
+			"severity": service_account_project_admin_role_severity(d),
 		}),
 		"payload": d.payload,
 	}
 }
 
-service_account_role_severity(d) := shisho.decision.severity_info {
+service_account_project_admin_role_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
 } else := 2
 
-service_account_role_locator(d) := d.locator {
+service_account_project_admin_role_locator(d) := d.locator {
 	not is_null(d.locator)
 } else := ""
 
-service_account_role_kind = "googlecloud_iam_service_account_role"
+service_account_project_admin_role_kind = "googlecloud_iam_service_account_project_admin_role"
 
-service_account_role_header(h) = x {
+service_account_project_admin_role_header(h) = x {
 	x := {
 		"api_version": "decision.api.shisho.dev/v1beta",
-		"kind": service_account_role_kind,
+		"kind": service_account_project_admin_role_kind,
 		"subject": h.subject,
 		"locator": h.locator,
 		"severity": h.severity,
@@ -334,25 +260,127 @@ service_account_role_header(h) = x {
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
-		"type": shisho.decision.as_decision_type(h.allowed),
+		"type": shisho.decision.as_decision_type(service_account_project_admin_role_allowed(h)),
 	}
 }
 
+# Force to allow the given decision following resource exception policy
+service_account_project_admin_role_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
+
 # METADATA
-# title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_role"
+# title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_project_admin_role"
 # scope: "rule"
 # description: |
-#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_role
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_project_admin_role
 #
 #   The parameter `data` is an object with the following fields: 
-#   - roles: string
+#   - suspicious_bindings: {"service_account_email": string, "role": string}
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "roles": ["example"],
+#     "suspicious_bindings": [{"service_account_email": "example", "role": "example"}],
 #   }
 #   ```
-service_account_role_payload(edata) = x {
+service_account_project_admin_role_payload(edata) = x {
+	x := json.marshal(edata)
+}
+
+# @title Ensure a Cloud IAM principal can impersonate or attach only a limited set of service accounts
+# You can emit this decision as follows:
+# 
+# ```
+# import data.shisho
+# 
+# decisions[d] {
+#   # the resource ID to review (e.g. a GitHub repository, etc.)
+#   subject := "test"
+#
+#   # whether the target is allowed by this policy or not
+#   allowed := true
+#
+#   d := shisho.decision.googlecloud.iam.service_account_project_impersonation_role({
+#     "allowed": allowed,
+#     "subject": subject,
+#     "payload": shisho.decision.googlecloud.iam.service_account_project_impersonation_role_payload({
+#       "permissive_principals": ["example"],
+#     }),
+#   })
+# }
+# ```
+
+# METADATA
+# title: "decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_project_impersonation_role"
+# scope: "rule"
+# description: |
+#   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_project_impersonation_role".
+service_account_project_impersonation_role(d) = x {
+	x := {
+		"header": service_account_project_impersonation_role_header({
+			"allowed": d.allowed,
+			"subject": d.subject,
+			"locator": service_account_project_impersonation_role_locator(d),
+			"severity": service_account_project_impersonation_role_severity(d),
+		}),
+		"payload": d.payload,
+	}
+}
+
+service_account_project_impersonation_role_severity(d) := shisho.decision.severity_info {
+	d.allowed == true
+} else := d.severity {
+	not is_null(d.severity)
+} else := 2
+
+service_account_project_impersonation_role_locator(d) := d.locator {
+	not is_null(d.locator)
+} else := ""
+
+service_account_project_impersonation_role_kind = "googlecloud_iam_service_account_project_impersonation_role"
+
+service_account_project_impersonation_role_header(h) = x {
+	x := {
+		"api_version": "decision.api.shisho.dev/v1beta",
+		"kind": service_account_project_impersonation_role_kind,
+		"subject": h.subject,
+		"locator": h.locator,
+		"severity": h.severity,
+		"labels": {},
+		"annotations": {
+			"decision.api.shisho.dev:googlecloud/cis-benchmark/v1.3.0": "1.6",
+			"decision.api.shisho.dev:needs-manual-review": "false",
+			"decision.api.shisho.dev:ssc/category": "infrastructure",
+		},
+		"type": shisho.decision.as_decision_type(service_account_project_impersonation_role_allowed(h)),
+	}
+}
+
+# Force to allow the given decision following resource exception policy
+service_account_project_impersonation_role_allowed(h) {
+	data.params != null
+	data.params.resource_exceptions != null
+	shisho.resource.is_excepted(data.params.resource_exceptions, h.subject)
+} else := h.allowed
+
+# METADATA
+# title: "Entry of decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_project_impersonation_role"
+# scope: "rule"
+# description: |
+#   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_project_impersonation_role
+#
+#   The parameter `data` is an object with the following fields: 
+#   - permissive_principals: string
+#
+#   For instance, `data` can take the following value:
+#   ```rego
+#   {
+#     "permissive_principals": ["example"],
+#   }
+#   ```
+service_account_project_impersonation_role_payload(edata) = x {
 	x := json.marshal(edata)
 }

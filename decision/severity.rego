@@ -44,3 +44,14 @@ severity_high = 3
 #
 #   If you'd like to work with `shisho.decision.*.*_with_severity` functions, please specify this constant for `severity` argument.
 severity_critical = 4
+
+# METADATA
+# title: "Determines whether a decision "
+# scope: "rule"
+# description: |
+#   Determines whether a decision allows input.
+has_severity(d, s) {
+	d.header.severity == s
+} else = false {
+	true
+}

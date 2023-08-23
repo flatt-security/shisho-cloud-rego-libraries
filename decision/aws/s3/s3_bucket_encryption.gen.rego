@@ -22,7 +22,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.aws.s3.bucket_encryption_payload({
-#       "algorithm": ["example"],
+#       "algorithms": ["example"],
 #     }),
 #   })
 # }
@@ -67,6 +67,7 @@ bucket_encryption_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:aws/cis-benchmark/v1.5.0": "2.1.1",
+			"decision.api.shisho.dev:aws/fsbp/latest": "S3.4",
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
@@ -88,12 +89,12 @@ bucket_encryption_allowed(h) {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_s3_bucket_encryption
 #
 #   The parameter `data` is an object with the following fields: 
-#   - algorithm: string
+#   - algorithms: string
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "algorithm": ["example"],
+#     "algorithms": ["example"],
 #   }
 #   ```
 bucket_encryption_payload(edata) = x {

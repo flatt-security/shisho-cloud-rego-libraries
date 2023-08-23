@@ -66,7 +66,7 @@ rdp_access_header(h) = x {
 		"severity": h.severity,
 		"labels": {},
 		"annotations": {
-			"decision.api.shisho.dev:googlecloud/cis-benchmark/v1.3.0": "3.6",
+			"decision.api.shisho.dev:googlecloud/cis-benchmark/v1.3.0": "3.7",
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

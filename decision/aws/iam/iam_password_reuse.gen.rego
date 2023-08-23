@@ -68,6 +68,7 @@ password_reuse_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:aws/cis-benchmark/v1.5.0": "1.9",
+			"decision.api.shisho.dev:aws/fsbp/latest": "IAM.16",
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

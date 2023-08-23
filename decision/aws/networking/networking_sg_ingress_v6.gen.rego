@@ -5,7 +5,7 @@ package shisho.decision.aws.networking
 
 import data.shisho
 
-# @title 5.3 Ensure no security groups allow ingress from ::/0 to remote server administration ports (Automated)
+# @title Ensure no security groups allow ingress from ::/0 to remote server administration ports
 # You can emit this decision as follows:
 # 
 # ```

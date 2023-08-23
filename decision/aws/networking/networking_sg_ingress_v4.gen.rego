@@ -5,7 +5,7 @@ package shisho.decision.aws.networking
 
 import data.shisho
 
-# @title 5.2 Ensure no security groups allow ingress from 0.0.0.0/0 to remote server administration ports (Automated)
+# @title Ensure no security groups allow ingress from 0.0.0.0/0 to remote server administration ports
 # You can emit this decision as follows:
 # 
 # ```
@@ -66,6 +66,7 @@ sg_ingress_v4_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:aws/cis-benchmark/v1.5.0": "5.1",
+			"decision.api.shisho.dev:aws/fsbp/latest": "EC2.14",
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

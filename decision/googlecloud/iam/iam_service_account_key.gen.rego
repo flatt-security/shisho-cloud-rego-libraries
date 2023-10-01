@@ -67,6 +67,7 @@ service_account_key_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:googlecloud/cis-benchmark/v1.3.0": "1.4",
+			"decision.api.shisho.dev:googlecloud/scc-premium/latest": "IAM_SCANNER.USER_MANAGED_SERVICE_ACCOUNT_KEY",
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

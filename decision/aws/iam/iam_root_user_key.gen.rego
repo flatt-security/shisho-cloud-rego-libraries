@@ -49,7 +49,7 @@ root_user_key_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 3
+} else := 4
 
 root_user_key_locator(d) := d.locator {
 	not is_null(d.locator)

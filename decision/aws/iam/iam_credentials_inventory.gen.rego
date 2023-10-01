@@ -50,7 +50,7 @@ credentials_inventory_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 2
+} else := 3
 
 credentials_inventory_locator(d) := d.locator {
 	not is_null(d.locator)

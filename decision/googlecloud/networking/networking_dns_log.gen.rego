@@ -49,7 +49,7 @@ dns_log_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 0
+} else := 1
 
 dns_log_locator(d) := d.locator {
 	not is_null(d.locator)
@@ -67,6 +67,7 @@ dns_log_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:googlecloud/cis-benchmark/v1.3.0": "2.12",
+			"decision.api.shisho.dev:googlecloud/scc-premium/latest": "FIREWALL_SCANNER.EGRESS_DENY_RULE_NOT_SET",
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

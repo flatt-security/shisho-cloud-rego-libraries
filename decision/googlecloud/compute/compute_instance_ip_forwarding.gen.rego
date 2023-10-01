@@ -49,7 +49,7 @@ instance_ip_forwarding_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 3
+} else := 2
 
 instance_ip_forwarding_locator(d) := d.locator {
 	not is_null(d.locator)

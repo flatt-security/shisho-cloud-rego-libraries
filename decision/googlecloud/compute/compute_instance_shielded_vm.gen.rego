@@ -51,7 +51,7 @@ instance_shielded_vm_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 2
+} else := 1
 
 instance_shielded_vm_locator(d) := d.locator {
 	not is_null(d.locator)

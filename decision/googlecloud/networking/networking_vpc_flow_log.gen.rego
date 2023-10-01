@@ -67,6 +67,7 @@ vpc_flow_log_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:googlecloud/cis-benchmark/v1.3.0": "3.8",
+			"decision.api.shisho.dev:googlecloud/scc-premium/latest": "SUBNETWORK_SCANNER.FLOW_LOGS_DISABLED",
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

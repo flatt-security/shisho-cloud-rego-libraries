@@ -50,7 +50,7 @@ dataset_encryption_cmek_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 0
+} else := 1
 
 dataset_encryption_cmek_locator(d) := d.locator {
 	not is_null(d.locator)

@@ -49,7 +49,7 @@ instance_accessibility_severity(d) := shisho.decision.severity_info {
 	d.allowed == true
 } else := d.severity {
 	not is_null(d.severity)
-} else := 4
+} else := 3
 
 instance_accessibility_locator(d) := d.locator {
 	not is_null(d.locator)

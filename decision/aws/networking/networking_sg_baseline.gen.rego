@@ -5,7 +5,7 @@ package shisho.decision.aws.networking
 
 import data.shisho
 
-# @title Block all traffic by the default security group to avoid using it
+# @title Ensure the default security group restricts all traffic
 # You can emit this decision as follows:
 # 
 # ```
@@ -22,6 +22,8 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.aws.networking.sg_baseline_payload({
+#       "ip_permissions_egress": [{"ip_protocol": "example", "from_port": 0, "to_port": 0}],
+#       "ip_permissions_ingress": [{"ip_protocol": "example", "from_port": 0, "to_port": 0}],
 #     }),
 #   })
 # }
@@ -86,7 +88,17 @@ sg_baseline_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_networking_sg_baseline
 #
-#   The parameter `data` shoud be empty object (`{}`).
+#   The parameter `data` is an object with the following fields: 
+#   - ip_permissions_egress: {"ip_protocol": string, "from_port": number, "to_port": number}
+#   - ip_permissions_ingress: {"ip_protocol": string, "from_port": number, "to_port": number}
+#
+#   For instance, `data` can take the following value:
+#   ```rego
+#   {
+#     "ip_permissions_egress": [{"ip_protocol": "example", "from_port": 0, "to_port": 0}],
+#     "ip_permissions_ingress": [{"ip_protocol": "example", "from_port": 0, "to_port": 0}],
+#   }
+#   ```
 sg_baseline_payload(edata) = x {
 	x := json.marshal(edata)
 }

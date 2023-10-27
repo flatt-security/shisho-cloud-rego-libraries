@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure IAM password policy prevents password reuse
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -94,7 +94,7 @@ password_reuse_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_iam_password_reuse
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - current_reuse_prevention: number
 #   - reuse_prevention_policy_recommendation: number
 #

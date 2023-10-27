@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure dependencies of GitHub Actions workflows are pinned to verified versions
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -91,7 +91,7 @@ dependency_pinning_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_actions_dependency_pinning
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - unpinned_dependencies: {"path": string, "line": number, "column": number, "dependency": string}
 #
 #   For instance, `data` can take the following value:
@@ -164,10 +164,10 @@ dependency_pinning_payload_assert_unpinned_dependencies_element_path(x, key, hin
 
 # @title Ensure script evaluation by GitHub Actions workflows is validated
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -244,7 +244,7 @@ insecure_script_evaluation_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_actions_insecure_script_evaluation
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - evaluated_scripts: {"path": string, "source_command": string, "line": number, "column": number}
 #
 #   For instance, `data` can take the following value:
@@ -317,10 +317,10 @@ insecure_script_evaluation_payload_assert_evaluated_scripts_element_source_comma
 
 # @title Ensure explicit permissions for GitHub Actions workflows follow organization policies
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -397,7 +397,7 @@ workflow_explicit_permissions_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_actions_workflow_explicit_permissions
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - workflows_with_excessive_permissions: {"path": string, "excessive_permissions": string}
 #
 #   For instance, `data` can take the following value:
@@ -471,10 +471,10 @@ workflow_explicit_permissions_payload_assert_workflows_with_excessive_permission
 
 # @title Ensure GitHub Actions workflows do not permit any script injections
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -551,7 +551,7 @@ workflow_script_injection_possibility_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_actions_workflow_script_injection_possibility
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - injectable_sinks: {"path": string, "line": number, "column": number, "abusable_fields": string}
 #
 #   For instance, `data` can take the following value:
@@ -637,10 +637,10 @@ workflow_script_injection_possibility_payload_assert_injectable_sinks_element_pa
 
 # @title Ensure secrets do not appear in GitHub Actions Workflows directly
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -717,7 +717,7 @@ workflow_secret_handling_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_actions_workflow_secret_handling
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - hardcoded_secrets: {"path": string, "line": number, "column": number, "location_hint": string}
 #
 #   For instance, `data` can take the following value:

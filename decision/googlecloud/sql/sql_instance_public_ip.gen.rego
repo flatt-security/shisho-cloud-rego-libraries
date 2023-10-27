@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure Cloud SQL instances have public IPs only if they need
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -92,7 +92,7 @@ instance_public_ip_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_sql_instance_public_ip
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - has_public_ip: boolean
 #
 #   For instance, `data` can take the following value:

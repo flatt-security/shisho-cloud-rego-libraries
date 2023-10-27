@@ -32,7 +32,7 @@ severity_medium = 2
 # scope: "rule"
 # description: |
 #   Represents a severity of a decision.
-# 
+#
 #   If you'd like to work with `shisho.decision.*.*_with_severity` functions, please specify this constant for `severity` argument.
 severity_high = 3
 
@@ -52,6 +52,4 @@ severity_critical = 4
 #   Determines whether a decision allows input.
 has_severity(d, s) {
 	d.header.severity == s
-} else = false {
-	true
-}
+} else = false

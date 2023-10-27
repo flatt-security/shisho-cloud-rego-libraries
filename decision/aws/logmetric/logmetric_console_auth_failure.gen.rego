@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure a log metric filter and alarm exist for AWS Management Console authentication failures
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -92,7 +92,7 @@ console_auth_failure_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_logmetric_console_auth_failure
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - cis_notification_implementations: {"trail_name": string, "metric_name": string, "alarm_name": string, "sns_topic_arn": string}
 #
 #   For instance, `data` can take the following value:

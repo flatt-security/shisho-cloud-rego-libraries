@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure Cloud KMS encryption keys are rotated within a period of 90 days
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -94,7 +94,7 @@ key_rotation_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_kms_key_rotation
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - last_rotated_at: string
 #   - rotation_period_expectation_seconds: number
 #   - rotation_period_seconds: number

@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure MFA Delete is enabled on S3 buckets
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -92,7 +92,7 @@ bucket_mfa_delete_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_s3_bucket_mfa_delete
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - mfa_enabled: boolean
 #
 #   For instance, `data` can take the following value:

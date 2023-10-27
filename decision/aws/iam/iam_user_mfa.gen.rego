@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure multi-factor authentication (MFA) is enabled for all IAM users that have a console password
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -94,7 +94,7 @@ user_mfa_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_iam_user_mfa
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - has_console_password: boolean
 #   - mfa_active: boolean
 #

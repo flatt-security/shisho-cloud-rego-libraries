@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Update packages with known vulnerabilities
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -91,7 +91,7 @@ package_known_vulnerability_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:package_known_vulnerability
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - vulnerabilities: {"name": string, "version": string, "vuln_constraint": string, "vuln_id": string, "vuln_namespace": string, "advisories": string, "description": string, "found_at": string}
 #
 #   For instance, `data` can take the following value:

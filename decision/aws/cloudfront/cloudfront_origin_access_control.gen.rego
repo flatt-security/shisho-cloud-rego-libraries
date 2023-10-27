@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure CloudFront distributions with S3 backends use origin access control enabled
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -92,7 +92,7 @@ origin_access_control_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_cloudfront_origin_access_control
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - origins: {"id": string, "domain_name": string, "origin_access_control_configured": string, "origin_access_identity_configured": string}
 #
 #   For instance, `data` can take the following value:

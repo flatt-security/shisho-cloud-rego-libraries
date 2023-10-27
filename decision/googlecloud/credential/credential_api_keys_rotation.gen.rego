@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure API keys are rotated within reasonable days
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -92,7 +92,7 @@ api_keys_rotation_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_credential_api_keys_rotation
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - created_at: string
 #
 #   For instance, `data` can take the following value:

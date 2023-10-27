@@ -4,6 +4,10 @@
 package shisho.decision.aws.networking
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure no security groups allow ingress from ::/0 to remote server administration ports
 # You can emit this decision as follows:
@@ -33,6 +37,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_networking_sg_ingress_v6".
 sg_ingress_v6(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": sg_ingress_v6_header({
 			"allowed": d.allowed,
@@ -87,6 +92,17 @@ sg_ingress_v6_allowed(h) {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_networking_sg_ingress_v6
 #
 #   The parameter `data` shoud be empty object (`{}`).
-sg_ingress_v6_payload(edata) = x {
+sg_ingress_v6_payload(edata) := x {
+	sg_ingress_v6_payload_assert(edata, "<the argument to sg_ingress_v6_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+sg_ingress_v6_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := []
+	every c in key_checks { c }
+
+	value_checks := []
+	every c in value_checks { c }
+} else := false

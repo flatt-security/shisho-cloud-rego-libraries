@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.support
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Access Transparency is enabled
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_support_access_transparency".
 access_transparency(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": access_transparency_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ access_transparency_allowed(h) {
 #     "enabled": false,
 #   }
 #   ```
-access_transparency_payload(edata) = x {
+access_transparency_payload(edata) := x {
+	access_transparency_payload_assert(edata, "<the argument to access_transparency_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+access_transparency_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [access_transparency_payload_assert_enabled(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+access_transparency_payload_assert_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

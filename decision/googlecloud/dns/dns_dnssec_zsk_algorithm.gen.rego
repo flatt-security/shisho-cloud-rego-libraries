@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.dns
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure the Zone-Signing Key in Cloud DNS uses a secure algorithm
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_dns_dnssec_zsk_algorithm".
 dnssec_zsk_algorithm(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": dnssec_zsk_algorithm_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ dnssec_zsk_algorithm_allowed(h) {
 #     "algorithm": "example",
 #   }
 #   ```
-dnssec_zsk_algorithm_payload(edata) = x {
+dnssec_zsk_algorithm_payload(edata) := x {
+	dnssec_zsk_algorithm_payload_assert(edata, "<the argument to dnssec_zsk_algorithm_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+dnssec_zsk_algorithm_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "algorithm", concat("", [hint, ".", "algorithm"]))]
+	every c in key_checks { c }
+
+	value_checks := [dnssec_zsk_algorithm_payload_assert_algorithm(edata, "algorithm", concat("", [hint, ".", "algorithm"]))]
+	every c in value_checks { c }
+} else := false
+
+dnssec_zsk_algorithm_payload_assert_algorithm(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

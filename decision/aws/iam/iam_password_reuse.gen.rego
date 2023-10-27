@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure IAM password policy prevents password reuse
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_password_reuse".
 password_reuse(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": password_reuse_header({
 			"allowed": d.allowed,
@@ -100,6 +105,31 @@ password_reuse_allowed(h) {
 #     "reuse_prevention_policy_recommendation": 0,
 #   }
 #   ```
-password_reuse_payload(edata) = x {
+password_reuse_payload(edata) := x {
+	password_reuse_payload_assert(edata, "<the argument to password_reuse_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+password_reuse_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "current_reuse_prevention", concat("", [hint, ".", "current_reuse_prevention"])),
+		assertion.has_key(edata, "reuse_prevention_policy_recommendation", concat("", [hint, ".", "reuse_prevention_policy_recommendation"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		password_reuse_payload_assert_current_reuse_prevention(edata, "current_reuse_prevention", concat("", [hint, ".", "current_reuse_prevention"])),
+		password_reuse_payload_assert_reuse_prevention_policy_recommendation(edata, "reuse_prevention_policy_recommendation", concat("", [hint, ".", "reuse_prevention_policy_recommendation"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+password_reuse_payload_assert_current_reuse_prevention(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+password_reuse_payload_assert_reuse_prevention_policy_recommendation(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false

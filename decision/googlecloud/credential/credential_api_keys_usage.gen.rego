@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.credential
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure API keys do not exist in Google Cloud projects
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_credential_api_keys_usage".
 api_keys_usage(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": api_keys_usage_header({
 			"allowed": d.allowed,
@@ -96,6 +101,34 @@ api_keys_usage_allowed(h) {
 #     "api_key_names": ["example"],
 #   }
 #   ```
-api_keys_usage_payload(edata) = x {
+api_keys_usage_payload(edata) := x {
+	api_keys_usage_payload_assert(edata, "<the argument to api_keys_usage_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+api_keys_usage_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "api_key_names", concat("", [hint, ".", "api_key_names"]))]
+	every c in key_checks { c }
+
+	value_checks := [api_keys_usage_payload_assert_api_key_names(edata, "api_key_names", concat("", [hint, ".", "api_key_names"]))]
+	every c in value_checks { c }
+} else := false
+
+api_keys_usage_payload_assert_api_key_names(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [api_keys_usage_payload_assert_api_key_names_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+api_keys_usage_payload_assert_api_key_names_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

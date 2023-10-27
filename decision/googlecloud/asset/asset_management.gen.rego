@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.asset
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Google Cloud assets and their changes are recorded
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_asset_management".
 management(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": management_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ management_allowed(h) {
 #     "enabled": false,
 #   }
 #   ```
-management_payload(edata) = x {
+management_payload(edata) := x {
+	management_payload_assert(edata, "<the argument to management_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+management_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [management_payload_assert_enabled(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+management_payload_assert_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

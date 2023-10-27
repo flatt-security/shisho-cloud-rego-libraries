@@ -4,6 +4,10 @@
 package shisho.decision.aws.rds
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure auto minor version upgrade feature is enabled for RDS instances
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_rds_instance_auto_upgrade".
 instance_auto_upgrade(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_auto_upgrade_header({
 			"allowed": d.allowed,
@@ -97,6 +102,21 @@ instance_auto_upgrade_allowed(h) {
 #     "enabled": false,
 #   }
 #   ```
-instance_auto_upgrade_payload(edata) = x {
+instance_auto_upgrade_payload(edata) := x {
+	instance_auto_upgrade_payload_assert(edata, "<the argument to instance_auto_upgrade_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_auto_upgrade_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_auto_upgrade_payload_assert_enabled(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_auto_upgrade_payload_assert_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

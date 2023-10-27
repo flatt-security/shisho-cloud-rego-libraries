@@ -4,6 +4,10 @@
 package shisho.decision.aws.efs
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure EFS file systems are encrypted
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_efs_volume_encryption".
 volume_encryption(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": volume_encryption_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ volume_encryption_allowed(h) {
 #     "encrypted": false,
 #   }
 #   ```
-volume_encryption_payload(edata) = x {
+volume_encryption_payload(edata) := x {
+	volume_encryption_payload_assert(edata, "<the argument to volume_encryption_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+volume_encryption_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "encrypted", concat("", [hint, ".", "encrypted"]))]
+	every c in key_checks { c }
+
+	value_checks := [volume_encryption_payload_assert_encrypted(edata, "encrypted", concat("", [hint, ".", "encrypted"]))]
+	every c in value_checks { c }
+} else := false
+
+volume_encryption_payload_assert_encrypted(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure user-managed/external keys for service accounts are rotated every 90 days or fewer
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_key_rotation".
 service_account_key_rotation(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": service_account_key_rotation_header({
 			"allowed": d.allowed,
@@ -97,6 +102,52 @@ service_account_key_rotation_allowed(h) {
 #     "keys": [{"name": "example", "valid_after_at": "example"}],
 #   }
 #   ```
-service_account_key_rotation_payload(edata) = x {
+service_account_key_rotation_payload(edata) := x {
+	service_account_key_rotation_payload_assert(edata, "<the argument to service_account_key_rotation_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+service_account_key_rotation_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "keys", concat("", [hint, ".", "keys"]))]
+	every c in key_checks { c }
+
+	value_checks := [service_account_key_rotation_payload_assert_keys(edata, "keys", concat("", [hint, ".", "keys"]))]
+	every c in value_checks { c }
+} else := false
+
+service_account_key_rotation_payload_assert_keys(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [service_account_key_rotation_payload_assert_keys_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+service_account_key_rotation_payload_assert_keys_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "name", "string", hint),
+		assertion.has_typed_key(x[key], "valid_after_at", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		service_account_key_rotation_payload_assert_keys_element_name(x[key], "name", concat("", [hint, ".", "name"])),
+		service_account_key_rotation_payload_assert_keys_element_valid_after_at(x[key], "valid_after_at", concat("", [hint, ".", "valid_after_at"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+service_account_key_rotation_payload_assert_keys_element_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+service_account_key_rotation_payload_assert_keys_element_valid_after_at(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

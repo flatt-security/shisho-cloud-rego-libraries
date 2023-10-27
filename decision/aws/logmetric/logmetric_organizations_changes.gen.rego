@@ -4,6 +4,10 @@
 package shisho.decision.aws.logmetric
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure a log metric filter and alarm exist for AWS Organizations changes
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_logmetric_organizations_changes".
 organizations_changes(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": organizations_changes_header({
 			"allowed": d.allowed,
@@ -96,6 +101,65 @@ organizations_changes_allowed(h) {
 #     "cis_notification_implementations": [{"trail_name": "example", "metric_name": "example", "alarm_name": "example", "sns_topic_arn": "example"}],
 #   }
 #   ```
-organizations_changes_payload(edata) = x {
+organizations_changes_payload(edata) := x {
+	organizations_changes_payload_assert(edata, "<the argument to organizations_changes_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+organizations_changes_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "cis_notification_implementations", concat("", [hint, ".", "cis_notification_implementations"]))]
+	every c in key_checks { c }
+
+	value_checks := [organizations_changes_payload_assert_cis_notification_implementations(edata, "cis_notification_implementations", concat("", [hint, ".", "cis_notification_implementations"]))]
+	every c in value_checks { c }
+} else := false
+
+organizations_changes_payload_assert_cis_notification_implementations(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [organizations_changes_payload_assert_cis_notification_implementations_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+organizations_changes_payload_assert_cis_notification_implementations_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "trail_name", "string", hint),
+		assertion.has_typed_key(x[key], "metric_name", "string", hint),
+		assertion.has_typed_key(x[key], "sns_topic_arn", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		organizations_changes_payload_assert_cis_notification_implementations_element_trail_name(x[key], "trail_name", concat("", [hint, ".", "trail_name"])),
+		organizations_changes_payload_assert_cis_notification_implementations_element_metric_name(x[key], "metric_name", concat("", [hint, ".", "metric_name"])),
+		organizations_changes_payload_assert_cis_notification_implementations_element_alarm_name(x[key], "alarm_name", concat("", [hint, ".", "alarm_name"])),
+		organizations_changes_payload_assert_cis_notification_implementations_element_sns_topic_arn(x[key], "sns_topic_arn", concat("", [hint, ".", "sns_topic_arn"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+organizations_changes_payload_assert_cis_notification_implementations_element_alarm_name(x, key, hint) {
+	not primitive.has_key(x, key)
+} else {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+organizations_changes_payload_assert_cis_notification_implementations_element_metric_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+organizations_changes_payload_assert_cis_notification_implementations_element_sns_topic_arn(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+organizations_changes_payload_assert_cis_notification_implementations_element_trail_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

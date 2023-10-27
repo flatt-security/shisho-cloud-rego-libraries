@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.storage
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Cloud Storage buckets are public only if intended
 # You can emit this decision as follows:
@@ -22,7 +26,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.storage.bucket_accessibility_payload({
-#       "public_acl_rules": [{"role": "example", "principal": "example"}],
+#       "public_acl_rules": [{"role": "example", "entity": "example"}],
 #       "public_policy_bindings": [{"role": "example", "principal": "example"}],
 #     }),
 #   })
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_storage_bucket_accessibility".
 bucket_accessibility(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": bucket_accessibility_header({
 			"allowed": d.allowed,
@@ -89,16 +94,103 @@ bucket_accessibility_allowed(h) {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_storage_bucket_accessibility
 #
 #   The parameter `data` is an object with the following fields: 
-#   - public_acl_rules: {"role": string, "principal": string}
+#   - public_acl_rules: {"role": string, "entity": string}
 #   - public_policy_bindings: {"role": string, "principal": string}
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "public_acl_rules": [{"role": "example", "principal": "example"}],
+#     "public_acl_rules": [{"role": "example", "entity": "example"}],
 #     "public_policy_bindings": [{"role": "example", "principal": "example"}],
 #   }
 #   ```
-bucket_accessibility_payload(edata) = x {
+bucket_accessibility_payload(edata) := x {
+	bucket_accessibility_payload_assert(edata, "<the argument to bucket_accessibility_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+bucket_accessibility_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "public_acl_rules", concat("", [hint, ".", "public_acl_rules"])),
+		assertion.has_key(edata, "public_policy_bindings", concat("", [hint, ".", "public_policy_bindings"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		bucket_accessibility_payload_assert_public_acl_rules(edata, "public_acl_rules", concat("", [hint, ".", "public_acl_rules"])),
+		bucket_accessibility_payload_assert_public_policy_bindings(edata, "public_policy_bindings", concat("", [hint, ".", "public_policy_bindings"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+bucket_accessibility_payload_assert_public_acl_rules(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [bucket_accessibility_payload_assert_public_acl_rules_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+bucket_accessibility_payload_assert_public_acl_rules_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "role", "string", hint),
+		assertion.has_typed_key(x[key], "entity", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		bucket_accessibility_payload_assert_public_acl_rules_element_role(x[key], "role", concat("", [hint, ".", "role"])),
+		bucket_accessibility_payload_assert_public_acl_rules_element_entity(x[key], "entity", concat("", [hint, ".", "entity"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+bucket_accessibility_payload_assert_public_acl_rules_element_entity(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+bucket_accessibility_payload_assert_public_acl_rules_element_role(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+bucket_accessibility_payload_assert_public_policy_bindings(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [bucket_accessibility_payload_assert_public_policy_bindings_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+bucket_accessibility_payload_assert_public_policy_bindings_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "role", "string", hint),
+		assertion.has_typed_key(x[key], "principal", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		bucket_accessibility_payload_assert_public_policy_bindings_element_role(x[key], "role", concat("", [hint, ".", "role"])),
+		bucket_accessibility_payload_assert_public_policy_bindings_element_principal(x[key], "principal", concat("", [hint, ".", "principal"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+bucket_accessibility_payload_assert_public_policy_bindings_element_principal(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+bucket_accessibility_payload_assert_public_policy_bindings_element_role(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

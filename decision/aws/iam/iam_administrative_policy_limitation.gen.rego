@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure IAM policies that allow full administrative privileges are not attached
 # You can emit this decision as follows:
@@ -33,6 +37,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_administrative_policy_limitation".
 administrative_policy_limitation(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": administrative_policy_limitation_header({
 			"allowed": d.allowed,
@@ -88,6 +93,17 @@ administrative_policy_limitation_allowed(h) {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_iam_administrative_policy_limitation
 #
 #   The parameter `data` shoud be empty object (`{}`).
-administrative_policy_limitation_payload(edata) = x {
+administrative_policy_limitation_payload(edata) := x {
+	administrative_policy_limitation_payload_assert(edata, "<the argument to administrative_policy_limitation_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+administrative_policy_limitation_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := []
+	every c in key_checks { c }
+
+	value_checks := []
+	every c in value_checks { c }
+} else := false

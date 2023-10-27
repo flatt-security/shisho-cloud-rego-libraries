@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that security contact information is registered to AWS accounts
 # You can emit this decision as follows:
@@ -36,6 +40,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_account_alternate_contact".
 account_alternate_contact(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": account_alternate_contact_header({
 			"allowed": d.allowed,
@@ -102,6 +107,37 @@ account_alternate_contact_allowed(h) {
 #     "contact_for_security_registered": false,
 #   }
 #   ```
-account_alternate_contact_payload(edata) = x {
+account_alternate_contact_payload(edata) := x {
+	account_alternate_contact_payload_assert(edata, "<the argument to account_alternate_contact_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+account_alternate_contact_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "contact_for_billing_registered", concat("", [hint, ".", "contact_for_billing_registered"])),
+		assertion.has_key(edata, "contact_for_operations_registered", concat("", [hint, ".", "contact_for_operations_registered"])),
+		assertion.has_key(edata, "contact_for_security_registered", concat("", [hint, ".", "contact_for_security_registered"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		account_alternate_contact_payload_assert_contact_for_billing_registered(edata, "contact_for_billing_registered", concat("", [hint, ".", "contact_for_billing_registered"])),
+		account_alternate_contact_payload_assert_contact_for_operations_registered(edata, "contact_for_operations_registered", concat("", [hint, ".", "contact_for_operations_registered"])),
+		account_alternate_contact_payload_assert_contact_for_security_registered(edata, "contact_for_security_registered", concat("", [hint, ".", "contact_for_security_registered"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+account_alternate_contact_payload_assert_contact_for_billing_registered(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+account_alternate_contact_payload_assert_contact_for_operations_registered(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+account_alternate_contact_payload_assert_contact_for_security_registered(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

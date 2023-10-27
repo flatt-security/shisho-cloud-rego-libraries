@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.networking
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure the default network does not exist in Google Cloud projects
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_networking_default_network".
 default_network(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": default_network_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ default_network_allowed(h) {
 #     "default_network_exists": false,
 #   }
 #   ```
-default_network_payload(edata) = x {
+default_network_payload(edata) := x {
+	default_network_payload_assert(edata, "<the argument to default_network_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+default_network_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "default_network_exists", concat("", [hint, ".", "default_network_exists"]))]
+	every c in key_checks { c }
+
+	value_checks := [default_network_payload_assert_default_network_exists(edata, "default_network_exists", concat("", [hint, ".", "default_network_exists"]))]
+	every c in value_checks { c }
+} else := false
+
+default_network_payload_assert_default_network_exists(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

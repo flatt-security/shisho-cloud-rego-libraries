@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure the AWS root user is used only for limited usage
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_root_user_usage".
 root_user_usage(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": root_user_usage_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ root_user_usage_allowed(h) {
 #     "last_used_at": "example",
 #   }
 #   ```
-root_user_usage_payload(edata) = x {
+root_user_usage_payload(edata) := x {
+	root_user_usage_payload_assert(edata, "<the argument to root_user_usage_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+root_user_usage_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "last_used_at", concat("", [hint, ".", "last_used_at"]))]
+	every c in key_checks { c }
+
+	value_checks := [root_user_usage_payload_assert_last_used_at(edata, "last_used_at", concat("", [hint, ".", "last_used_at"]))]
+	every c in value_checks { c }
+} else := false
+
+root_user_usage_payload_assert_last_used_at(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

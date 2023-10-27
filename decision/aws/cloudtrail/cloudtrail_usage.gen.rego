@@ -4,6 +4,10 @@
 package shisho.decision.aws.cloudtrail
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure CloudTrail is enabled in all regions
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_cloudtrail_usage".
 usage(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": usage_header({
 			"allowed": d.allowed,
@@ -96,6 +101,34 @@ usage_allowed(h) {
 #     "trail_arns": ["example"],
 #   }
 #   ```
-usage_payload(edata) = x {
+usage_payload(edata) := x {
+	usage_payload_assert(edata, "<the argument to usage_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+usage_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "trail_arns", concat("", [hint, ".", "trail_arns"]))]
+	every c in key_checks { c }
+
+	value_checks := [usage_payload_assert_trail_arns(edata, "trail_arns", concat("", [hint, ".", "trail_arns"]))]
+	every c in value_checks { c }
+} else := false
+
+usage_payload_assert_trail_arns(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [usage_payload_assert_trail_arns_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+usage_payload_assert_trail_arns_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

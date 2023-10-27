@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.compute
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure connections to serial ports are disabled for Compute Engine instances
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_compute_instance_serial_port".
 instance_serial_port(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_serial_port_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ instance_serial_port_allowed(h) {
 #     "serial_port_enabled": false,
 #   }
 #   ```
-instance_serial_port_payload(edata) = x {
+instance_serial_port_payload(edata) := x {
+	instance_serial_port_payload_assert(edata, "<the argument to instance_serial_port_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_serial_port_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "serial_port_enabled", concat("", [hint, ".", "serial_port_enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_serial_port_payload_assert_serial_port_enabled(edata, "serial_port_enabled", concat("", [hint, ".", "serial_port_enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_serial_port_payload_assert_serial_port_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

@@ -4,6 +4,9 @@
 package shisho.decision.googlecloud.storage
 
 import data.shisho
+import data.shisho.assertion
+
+import future.keywords.every
 
 # @title Ensure Cloud Storage buckets enable uniform bucket level access
 # You can emit this decision as follows:
@@ -34,6 +37,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_storage_bucket_uniform_bucket_level_access".
 bucket_uniform_bucket_level_access(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": bucket_uniform_bucket_level_access_header({
 			"allowed": d.allowed,
@@ -96,6 +100,33 @@ bucket_uniform_bucket_level_access_allowed(h) {
 #     "uniform_access_enabled": false,
 #   }
 #   ```
-bucket_uniform_bucket_level_access_payload(edata) = x {
+bucket_uniform_bucket_level_access_payload(edata) := x {
+	bucket_uniform_bucket_level_access_payload_assert(edata, "<the argument to bucket_uniform_bucket_level_access_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+# IMPORTANT: the type `object` and `set` are allowed for this payload because older managed policies emit `set` instead of `object`.
+# The error will NOT prevent users from reviewing the security posture properly, but makes the evidence reported to Shisho Cloud unstructured.
+# This bug will be officialy informed and fixed in the future.
+bucket_uniform_bucket_level_access_payload_assert(edata, hint) {
+	assertion.is_type(edata, "set", hint)
+} else {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "uniform_access_enabled", concat("", [hint, ".", "uniform_access_enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [bucket_uniform_bucket_level_access_payload_assert_uniform_access_enabled(edata.uniform_access_enabled, concat("", [hint, ".", "uniform_access_enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+# IMPORTANT: the type `boolean` and `string` are allowed for this payload because older managed policies emit `string` instead of `bool`.
+# The error will NOT prevent users from reviewing the security posture properly, but makes the evidence reported to Shisho Cloud unstructured.
+# This bug will be officialy informed and fixed in the future.
+bucket_uniform_bucket_level_access_payload_assert_uniform_access_enabled(x, hint) {
+	is_null(x)
+} else {
+	assertion.is_type(x, "boolean", hint)
+} else {
+	assertion.is_type(x, "string", hint)
+} else := false

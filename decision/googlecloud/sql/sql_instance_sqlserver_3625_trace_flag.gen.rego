@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.sql
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that the 3625 (trace flag) database flag for all Cloud SQL for SQL Server instances is set to off
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_sql_instance_sqlserver_3625_trace_flag".
 instance_sqlserver_3625_trace_flag(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_sqlserver_3625_trace_flag_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ instance_sqlserver_3625_trace_flag_allowed(h) {
 #     "trace_flag_state": "example",
 #   }
 #   ```
-instance_sqlserver_3625_trace_flag_payload(edata) = x {
+instance_sqlserver_3625_trace_flag_payload(edata) := x {
+	instance_sqlserver_3625_trace_flag_payload_assert(edata, "<the argument to instance_sqlserver_3625_trace_flag_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_sqlserver_3625_trace_flag_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "trace_flag_state", concat("", [hint, ".", "trace_flag_state"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_sqlserver_3625_trace_flag_payload_assert_trace_flag_state(edata, "trace_flag_state", concat("", [hint, ".", "trace_flag_state"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_sqlserver_3625_trace_flag_payload_assert_trace_flag_state(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

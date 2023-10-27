@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.dataproc
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that Dataproc cluster is encrypted using customer-managed encryption key
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_dataproc_encryption_key".
 encryption_key(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": encryption_key_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ encryption_key_allowed(h) {
 #     "has_customer_managed_key": false,
 #   }
 #   ```
-encryption_key_payload(edata) = x {
+encryption_key_payload(edata) := x {
+	encryption_key_payload_assert(edata, "<the argument to encryption_key_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+encryption_key_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "has_customer_managed_key", concat("", [hint, ".", "has_customer_managed_key"]))]
+	every c in key_checks { c }
+
+	value_checks := [encryption_key_payload_assert_has_customer_managed_key(edata, "has_customer_managed_key", concat("", [hint, ".", "has_customer_managed_key"]))]
+	every c in value_checks { c }
+} else := false
+
+encryption_key_payload_assert_has_customer_managed_key(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

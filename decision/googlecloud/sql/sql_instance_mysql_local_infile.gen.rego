@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.sql
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that the local_infile database flag for a Cloud SQL for MySQL instance is set to off
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_sql_instance_mysql_local_infile".
 instance_mysql_local_infile(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_mysql_local_infile_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ instance_mysql_local_infile_allowed(h) {
 #     "local_infile_state": "example",
 #   }
 #   ```
-instance_mysql_local_infile_payload(edata) = x {
+instance_mysql_local_infile_payload(edata) := x {
+	instance_mysql_local_infile_payload_assert(edata, "<the argument to instance_mysql_local_infile_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_mysql_local_infile_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "local_infile_state", concat("", [hint, ".", "local_infile_state"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_mysql_local_infile_payload_assert_local_infile_state(edata, "local_infile_state", concat("", [hint, ".", "local_infile_state"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_mysql_local_infile_payload_assert_local_infile_state(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

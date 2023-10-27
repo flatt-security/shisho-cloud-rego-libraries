@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.sql
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure maximum_user_connections database flag for a Cloud SQL for SQL Server instance is set to a non-limiting value
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_sql_instance_sqlserver_user_connections".
 instance_sqlserver_user_connections(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_sqlserver_user_connections_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ instance_sqlserver_user_connections_allowed(h) {
 #     "maximum_user_connections": 0,
 #   }
 #   ```
-instance_sqlserver_user_connections_payload(edata) = x {
+instance_sqlserver_user_connections_payload(edata) := x {
+	instance_sqlserver_user_connections_payload_assert(edata, "<the argument to instance_sqlserver_user_connections_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_sqlserver_user_connections_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "maximum_user_connections", concat("", [hint, ".", "maximum_user_connections"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_sqlserver_user_connections_payload_assert_maximum_user_connections(edata, "maximum_user_connections", concat("", [hint, ".", "maximum_user_connections"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_sqlserver_user_connections_payload_assert_maximum_user_connections(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false

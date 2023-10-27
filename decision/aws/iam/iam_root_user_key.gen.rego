@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure the AWS root user does not have access keys
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_root_user_key".
 root_user_key(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": root_user_key_header({
 			"allowed": d.allowed,
@@ -97,6 +102,21 @@ root_user_key_allowed(h) {
 #     "root_has_access_keys": false,
 #   }
 #   ```
-root_user_key_payload(edata) = x {
+root_user_key_payload(edata) := x {
+	root_user_key_payload_assert(edata, "<the argument to root_user_key_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+root_user_key_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "root_has_access_keys", concat("", [hint, ".", "root_has_access_keys"]))]
+	every c in key_checks { c }
+
+	value_checks := [root_user_key_payload_assert_root_has_access_keys(edata, "root_has_access_keys", concat("", [hint, ".", "root_has_access_keys"]))]
+	every c in value_checks { c }
+} else := false
+
+root_user_key_payload_assert_root_has_access_keys(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

@@ -4,6 +4,10 @@
 package shisho.decision.aws.ebs
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure EBS volume encryption is enabled in all regions
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_ebs_volume_encryption_baseline".
 volume_encryption_baseline(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": volume_encryption_baseline_header({
 			"allowed": d.allowed,
@@ -97,6 +102,34 @@ volume_encryption_baseline_allowed(h) {
 #     "disabled_regions": ["example"],
 #   }
 #   ```
-volume_encryption_baseline_payload(edata) = x {
+volume_encryption_baseline_payload(edata) := x {
+	volume_encryption_baseline_payload_assert(edata, "<the argument to volume_encryption_baseline_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+volume_encryption_baseline_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "disabled_regions", concat("", [hint, ".", "disabled_regions"]))]
+	every c in key_checks { c }
+
+	value_checks := [volume_encryption_baseline_payload_assert_disabled_regions(edata, "disabled_regions", concat("", [hint, ".", "disabled_regions"]))]
+	every c in value_checks { c }
+} else := false
+
+volume_encryption_baseline_payload_assert_disabled_regions(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [volume_encryption_baseline_payload_assert_disabled_regions_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+volume_encryption_baseline_payload_assert_disabled_regions_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

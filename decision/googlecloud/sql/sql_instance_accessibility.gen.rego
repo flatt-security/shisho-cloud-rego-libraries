@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.sql
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Cloud SQL instances are exposed only to specific IP addresses
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_sql_instance_accessibility".
 instance_accessibility(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_accessibility_header({
 			"allowed": d.allowed,
@@ -96,6 +101,34 @@ instance_accessibility_allowed(h) {
 #     "ip_allowlist": ["example"],
 #   }
 #   ```
-instance_accessibility_payload(edata) = x {
+instance_accessibility_payload(edata) := x {
+	instance_accessibility_payload_assert(edata, "<the argument to instance_accessibility_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_accessibility_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "ip_allowlist", concat("", [hint, ".", "ip_allowlist"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_accessibility_payload_assert_ip_allowlist(edata, "ip_allowlist", concat("", [hint, ".", "ip_allowlist"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_accessibility_payload_assert_ip_allowlist(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [instance_accessibility_payload_assert_ip_allowlist_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+instance_accessibility_payload_assert_ip_allowlist_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

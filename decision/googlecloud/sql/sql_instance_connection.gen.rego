@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.sql
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Cloud SQL instances require TLS for all incoming connections
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_sql_instance_connection".
 instance_connection(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_connection_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ instance_connection_allowed(h) {
 #     "tls_required": false,
 #   }
 #   ```
-instance_connection_payload(edata) = x {
+instance_connection_payload(edata) := x {
+	instance_connection_payload_assert(edata, "<the argument to instance_connection_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_connection_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "tls_required", concat("", [hint, ".", "tls_required"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_connection_payload_assert_tls_required(edata, "tls_required", concat("", [hint, ".", "tls_required"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_connection_payload_assert_tls_required(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

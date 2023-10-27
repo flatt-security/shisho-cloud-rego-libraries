@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure IAM users receive permissions only through groups
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_user_group_permission_assignment".
 user_group_permission_assignment(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": user_group_permission_assignment_header({
 			"allowed": d.allowed,
@@ -97,6 +102,34 @@ user_group_permission_assignment_allowed(h) {
 #     "attached_policy_names": ["example"],
 #   }
 #   ```
-user_group_permission_assignment_payload(edata) = x {
+user_group_permission_assignment_payload(edata) := x {
+	user_group_permission_assignment_payload_assert(edata, "<the argument to user_group_permission_assignment_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+user_group_permission_assignment_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "attached_policy_names", concat("", [hint, ".", "attached_policy_names"]))]
+	every c in key_checks { c }
+
+	value_checks := [user_group_permission_assignment_payload_assert_attached_policy_names(edata, "attached_policy_names", concat("", [hint, ".", "attached_policy_names"]))]
+	every c in value_checks { c }
+} else := false
+
+user_group_permission_assignment_payload_assert_attached_policy_names(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [user_group_permission_assignment_payload_assert_attached_policy_names_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+user_group_permission_assignment_payload_assert_attached_policy_names_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

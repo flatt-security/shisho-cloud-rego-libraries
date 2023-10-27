@@ -4,6 +4,10 @@
 package shisho.decision.aws.cloudtrail
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure CloudTrail trails are integrated with CloudWatch Logs
 # You can emit this decision as follows:
@@ -22,7 +26,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.aws.cloudtrail.cloudwatch_logs_integration_payload({
-#       "integrated": "example",
+#       "integrated": false,
 #     }),
 #   })
 # }
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_cloudtrail_cloudwatch_logs_integration".
 cloudwatch_logs_integration(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": cloudwatch_logs_integration_header({
 			"allowed": d.allowed,
@@ -88,14 +93,29 @@ cloudwatch_logs_integration_allowed(h) {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_cloudtrail_cloudwatch_logs_integration
 #
 #   The parameter `data` is an object with the following fields: 
-#   - integrated: string
+#   - integrated: boolean
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "integrated": "example",
+#     "integrated": false,
 #   }
 #   ```
-cloudwatch_logs_integration_payload(edata) = x {
+cloudwatch_logs_integration_payload(edata) := x {
+	cloudwatch_logs_integration_payload_assert(edata, "<the argument to cloudwatch_logs_integration_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+cloudwatch_logs_integration_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "integrated", concat("", [hint, ".", "integrated"]))]
+	every c in key_checks { c }
+
+	value_checks := [cloudwatch_logs_integration_payload_assert_integrated(edata, "integrated", concat("", [hint, ".", "integrated"]))]
+	every c in value_checks { c }
+} else := false
+
+cloudwatch_logs_integration_payload_assert_integrated(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

@@ -4,6 +4,10 @@
 package shisho.decision.source
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Manage sources with a version control system
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:version_control".
 version_control(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": version_control_header({
 			"allowed": d.allowed,
@@ -95,6 +100,21 @@ version_control_allowed(h) {
 #     "type": "example",
 #   }
 #   ```
-version_control_payload(edata) = x {
+version_control_payload(edata) := x {
+	version_control_payload_assert(edata, "<the argument to version_control_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+version_control_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "type", concat("", [hint, ".", "type"]))]
+	every c in key_checks { c }
+
+	value_checks := [version_control_payload_assert_type(edata, "type", concat("", [hint, ".", "type"]))]
+	every c in value_checks { c }
+} else := false
+
+version_control_payload_assert_type(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

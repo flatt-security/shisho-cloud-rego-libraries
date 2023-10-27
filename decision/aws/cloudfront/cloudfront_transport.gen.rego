@@ -4,6 +4,10 @@
 package shisho.decision.aws.cloudfront
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that connections to CloudFront distributions are forced to use HTTPS
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_cloudfront_transport".
 transport(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": transport_header({
 			"allowed": d.allowed,
@@ -96,6 +101,58 @@ transport_allowed(h) {
 #     "cache_behaviors": [{"path_pattern": "example", "target_origin_id": "example", "viewer_protocol_policy": "example"}],
 #   }
 #   ```
-transport_payload(edata) = x {
+transport_payload(edata) := x {
+	transport_payload_assert(edata, "<the argument to transport_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+transport_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "cache_behaviors", concat("", [hint, ".", "cache_behaviors"]))]
+	every c in key_checks { c }
+
+	value_checks := [transport_payload_assert_cache_behaviors(edata, "cache_behaviors", concat("", [hint, ".", "cache_behaviors"]))]
+	every c in value_checks { c }
+} else := false
+
+transport_payload_assert_cache_behaviors(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [transport_payload_assert_cache_behaviors_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+transport_payload_assert_cache_behaviors_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "path_pattern", "string", hint),
+		assertion.has_typed_key(x[key], "target_origin_id", "string", hint),
+		assertion.has_typed_key(x[key], "viewer_protocol_policy", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		transport_payload_assert_cache_behaviors_element_path_pattern(x[key], "path_pattern", concat("", [hint, ".", "path_pattern"])),
+		transport_payload_assert_cache_behaviors_element_target_origin_id(x[key], "target_origin_id", concat("", [hint, ".", "target_origin_id"])),
+		transport_payload_assert_cache_behaviors_element_viewer_protocol_policy(x[key], "viewer_protocol_policy", concat("", [hint, ".", "viewer_protocol_policy"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+transport_payload_assert_cache_behaviors_element_path_pattern(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+transport_payload_assert_cache_behaviors_element_target_origin_id(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+transport_payload_assert_cache_behaviors_element_viewer_protocol_policy(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

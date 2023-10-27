@@ -4,6 +4,10 @@
 package shisho.decision.aws.cloudfront
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure CloudFront distributions have an active logging bucket
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_cloudfront_logging".
 logging(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": logging_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ logging_allowed(h) {
 #     "bucket_id": "example",
 #   }
 #   ```
-logging_payload(edata) = x {
+logging_payload(edata) := x {
+	logging_payload_assert(edata, "<the argument to logging_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+logging_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "bucket_id", concat("", [hint, ".", "bucket_id"]))]
+	every c in key_checks { c }
+
+	value_checks := [logging_payload_assert_bucket_id(edata, "bucket_id", concat("", [hint, ".", "bucket_id"]))]
+	every c in value_checks { c }
+} else := false
+
+logging_payload_assert_bucket_id(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

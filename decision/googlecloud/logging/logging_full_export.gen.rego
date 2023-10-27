@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.logging
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that at least one sink is configured for all log entries
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_logging_full_export".
 full_export(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": full_export_header({
 			"allowed": d.allowed,
@@ -96,6 +101,34 @@ full_export_allowed(h) {
 #     "empty_filter_sinks": ["example"],
 #   }
 #   ```
-full_export_payload(edata) = x {
+full_export_payload(edata) := x {
+	full_export_payload_assert(edata, "<the argument to full_export_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+full_export_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "empty_filter_sinks", concat("", [hint, ".", "empty_filter_sinks"]))]
+	every c in key_checks { c }
+
+	value_checks := [full_export_payload_assert_empty_filter_sinks(edata, "empty_filter_sinks", concat("", [hint, ".", "empty_filter_sinks"]))]
+	every c in value_checks { c }
+} else := false
+
+full_export_payload_assert_empty_filter_sinks(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [full_export_payload_assert_empty_filter_sinks_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+full_export_payload_assert_empty_filter_sinks_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

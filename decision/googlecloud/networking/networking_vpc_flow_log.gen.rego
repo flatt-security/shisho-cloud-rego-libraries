@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.networking
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure VPC Flow Logs feature is enabled for critical VPC networks and subnets
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_networking_vpc_flow_log".
 vpc_flow_log(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": vpc_flow_log_header({
 			"allowed": d.allowed,
@@ -97,6 +102,21 @@ vpc_flow_log_allowed(h) {
 #     "flow_log_enabled": false,
 #   }
 #   ```
-vpc_flow_log_payload(edata) = x {
+vpc_flow_log_payload(edata) := x {
+	vpc_flow_log_payload_assert(edata, "<the argument to vpc_flow_log_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+vpc_flow_log_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "flow_log_enabled", concat("", [hint, ".", "flow_log_enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [vpc_flow_log_payload_assert_flow_log_enabled(edata, "flow_log_enabled", concat("", [hint, ".", "flow_log_enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+vpc_flow_log_payload_assert_flow_log_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

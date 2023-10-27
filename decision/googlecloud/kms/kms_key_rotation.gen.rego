@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.kms
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Cloud KMS encryption keys are rotated within a period of 90 days
 # You can emit this decision as follows:
@@ -36,6 +40,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_kms_key_rotation".
 key_rotation(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": key_rotation_header({
 			"allowed": d.allowed,
@@ -102,6 +107,37 @@ key_rotation_allowed(h) {
 #     "rotation_period_seconds": 0,
 #   }
 #   ```
-key_rotation_payload(edata) = x {
+key_rotation_payload(edata) := x {
+	key_rotation_payload_assert(edata, "<the argument to key_rotation_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+key_rotation_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "last_rotated_at", concat("", [hint, ".", "last_rotated_at"])),
+		assertion.has_key(edata, "rotation_period_expectation_seconds", concat("", [hint, ".", "rotation_period_expectation_seconds"])),
+		assertion.has_key(edata, "rotation_period_seconds", concat("", [hint, ".", "rotation_period_seconds"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		key_rotation_payload_assert_last_rotated_at(edata, "last_rotated_at", concat("", [hint, ".", "last_rotated_at"])),
+		key_rotation_payload_assert_rotation_period_expectation_seconds(edata, "rotation_period_expectation_seconds", concat("", [hint, ".", "rotation_period_expectation_seconds"])),
+		key_rotation_payload_assert_rotation_period_seconds(edata, "rotation_period_seconds", concat("", [hint, ".", "rotation_period_seconds"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+key_rotation_payload_assert_last_rotated_at(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+key_rotation_payload_assert_rotation_period_expectation_seconds(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+key_rotation_payload_assert_rotation_period_seconds(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false

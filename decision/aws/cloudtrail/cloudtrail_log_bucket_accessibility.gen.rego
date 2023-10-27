@@ -4,6 +4,10 @@
 package shisho.decision.aws.cloudtrail
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure the S3 bucket for CloudTrail logs is not publicly accessible
 # You can emit this decision as follows:
@@ -22,7 +26,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.aws.cloudtrail.log_bucket_accessibility_payload({
-#       "acl_rules": [{"grantee_uri": "example", "permission": "example"}],
+#       "acl_rules": [{"grantee_url": "example", "permission": "example"}],
 #       "bucket_name": "example",
 #       "bucket_policy_document": "example",
 #     }),
@@ -36,6 +40,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_cloudtrail_log_bucket_accessibility".
 log_bucket_accessibility(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": log_bucket_accessibility_header({
 			"allowed": d.allowed,
@@ -90,18 +95,80 @@ log_bucket_accessibility_allowed(h) {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_cloudtrail_log_bucket_accessibility
 #
 #   The parameter `data` is an object with the following fields: 
-#   - acl_rules: {"grantee_uri": string, "permission": string}
+#   - acl_rules: {"grantee_url": string, "permission": string}
 #   - bucket_name: string
 #   - bucket_policy_document: string
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "acl_rules": [{"grantee_uri": "example", "permission": "example"}],
+#     "acl_rules": [{"grantee_url": "example", "permission": "example"}],
 #     "bucket_name": "example",
 #     "bucket_policy_document": "example",
 #   }
 #   ```
-log_bucket_accessibility_payload(edata) = x {
+log_bucket_accessibility_payload(edata) := x {
+	log_bucket_accessibility_payload_assert(edata, "<the argument to log_bucket_accessibility_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+log_bucket_accessibility_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "acl_rules", concat("", [hint, ".", "acl_rules"])),
+		assertion.has_key(edata, "bucket_name", concat("", [hint, ".", "bucket_name"])),
+		assertion.has_key(edata, "bucket_policy_document", concat("", [hint, ".", "bucket_policy_document"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		log_bucket_accessibility_payload_assert_acl_rules(edata, "acl_rules", concat("", [hint, ".", "acl_rules"])),
+		log_bucket_accessibility_payload_assert_bucket_name(edata, "bucket_name", concat("", [hint, ".", "bucket_name"])),
+		log_bucket_accessibility_payload_assert_bucket_policy_document(edata, "bucket_policy_document", concat("", [hint, ".", "bucket_policy_document"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+log_bucket_accessibility_payload_assert_acl_rules(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [log_bucket_accessibility_payload_assert_acl_rules_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+log_bucket_accessibility_payload_assert_acl_rules_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "grantee_url", "string", hint),
+		assertion.has_typed_key(x[key], "permission", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		log_bucket_accessibility_payload_assert_acl_rules_element_grantee_url(x[key], "grantee_url", concat("", [hint, ".", "grantee_url"])),
+		log_bucket_accessibility_payload_assert_acl_rules_element_permission(x[key], "permission", concat("", [hint, ".", "permission"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+log_bucket_accessibility_payload_assert_acl_rules_element_grantee_url(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+log_bucket_accessibility_payload_assert_acl_rules_element_permission(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+log_bucket_accessibility_payload_assert_bucket_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+log_bucket_accessibility_payload_assert_bucket_policy_document(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

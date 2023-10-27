@@ -4,6 +4,10 @@
 package shisho.decision.aws.alb
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Application Load Balancers mitigate HTTP desync attacks
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_alb_desync_mitigation".
 desync_mitigation(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": desync_mitigation_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ desync_mitigation_allowed(h) {
 #     "desync_mitigation_mode": "example",
 #   }
 #   ```
-desync_mitigation_payload(edata) = x {
+desync_mitigation_payload(edata) := x {
+	desync_mitigation_payload_assert(edata, "<the argument to desync_mitigation_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+desync_mitigation_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "desync_mitigation_mode", concat("", [hint, ".", "desync_mitigation_mode"]))]
+	every c in key_checks { c }
+
+	value_checks := [desync_mitigation_payload_assert_desync_mitigation_mode(edata, "desync_mitigation_mode", concat("", [hint, ".", "desync_mitigation_mode"]))]
+	every c in value_checks { c }
+} else := false
+
+desync_mitigation_payload_assert_desync_mitigation_mode(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

@@ -4,6 +4,10 @@
 package shisho.decision.aws.securityhub
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure AWS Security Hub is enabled
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_securityhub_usage".
 usage(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": usage_header({
 			"allowed": d.allowed,
@@ -99,6 +104,57 @@ usage_allowed(h) {
 #     "missing_regions": ["example"],
 #   }
 #   ```
-usage_payload(edata) = x {
+usage_payload(edata) := x {
+	usage_payload_assert(edata, "<the argument to usage_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+usage_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "enabled_regions", concat("", [hint, ".", "enabled_regions"])),
+		assertion.has_key(edata, "missing_regions", concat("", [hint, ".", "missing_regions"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		usage_payload_assert_enabled_regions(edata, "enabled_regions", concat("", [hint, ".", "enabled_regions"])),
+		usage_payload_assert_missing_regions(edata, "missing_regions", concat("", [hint, ".", "missing_regions"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+usage_payload_assert_enabled_regions(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [usage_payload_assert_enabled_regions_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+usage_payload_assert_enabled_regions_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+usage_payload_assert_missing_regions(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [usage_payload_assert_missing_regions_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+usage_payload_assert_missing_regions_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

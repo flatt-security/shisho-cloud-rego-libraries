@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure there is only one active access key available for any single IAM user
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_user_available_access_keys".
 user_available_access_keys(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": user_available_access_keys_header({
 			"allowed": d.allowed,
@@ -96,6 +101,34 @@ user_available_access_keys_allowed(h) {
 #     "access_key_ids": ["example"],
 #   }
 #   ```
-user_available_access_keys_payload(edata) = x {
+user_available_access_keys_payload(edata) := x {
+	user_available_access_keys_payload_assert(edata, "<the argument to user_available_access_keys_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+user_available_access_keys_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "access_key_ids", concat("", [hint, ".", "access_key_ids"]))]
+	every c in key_checks { c }
+
+	value_checks := [user_available_access_keys_payload_assert_access_key_ids(edata, "access_key_ids", concat("", [hint, ".", "access_key_ids"]))]
+	every c in value_checks { c }
+} else := false
+
+user_available_access_keys_payload_assert_access_key_ids(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [user_available_access_keys_payload_assert_access_key_ids_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+user_available_access_keys_payload_assert_access_key_ids_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

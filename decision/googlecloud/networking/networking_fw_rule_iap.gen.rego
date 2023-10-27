@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.networking
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that VPC networks allow only traffic from Google IP addresses with Identity Aware Proxy (IAP)
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_networking_fw_rule_iap".
 fw_rule_iap(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": fw_rule_iap_header({
 			"allowed": d.allowed,
@@ -96,6 +101,133 @@ fw_rule_iap_allowed(h) {
 #     "ingress_rules": [{"name": "example", "source_ranges": ["example"], "allow_rules": [{"ip_protocol": "example", "port_ranges": [{"from": 0, "to": 0}]}]}],
 #   }
 #   ```
-fw_rule_iap_payload(edata) = x {
+fw_rule_iap_payload(edata) := x {
+	fw_rule_iap_payload_assert(edata, "<the argument to fw_rule_iap_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+fw_rule_iap_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "ingress_rules", concat("", [hint, ".", "ingress_rules"]))]
+	every c in key_checks { c }
+
+	value_checks := [fw_rule_iap_payload_assert_ingress_rules(edata, "ingress_rules", concat("", [hint, ".", "ingress_rules"]))]
+	every c in value_checks { c }
+} else := false
+
+fw_rule_iap_payload_assert_ingress_rules(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [fw_rule_iap_payload_assert_ingress_rules_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+fw_rule_iap_payload_assert_ingress_rules_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "name", "string", hint),
+		assertion.has_typed_key(x[key], "source_ranges", "array", hint),
+		assertion.has_typed_key(x[key], "allow_rules", "array", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		fw_rule_iap_payload_assert_ingress_rules_element_name(x[key], "name", concat("", [hint, ".", "name"])),
+		fw_rule_iap_payload_assert_ingress_rules_element_source_ranges(x[key], "source_ranges", concat("", [hint, ".", "source_ranges"])),
+		fw_rule_iap_payload_assert_ingress_rules_element_allow_rules(x[key], "allow_rules", concat("", [hint, ".", "allow_rules"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+fw_rule_iap_payload_assert_ingress_rules_element_allow_rules(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [fw_rule_iap_payload_assert_ingress_rules_element_allow_rules_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+fw_rule_iap_payload_assert_ingress_rules_element_allow_rules_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "ip_protocol", "string", hint),
+		assertion.has_typed_key(x[key], "port_ranges", "array", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		fw_rule_iap_payload_assert_ingress_rules_element_allow_rules_element_ip_protocol(x[key], "ip_protocol", concat("", [hint, ".", "ip_protocol"])),
+		fw_rule_iap_payload_assert_ingress_rules_element_allow_rules_element_port_ranges(x[key], "port_ranges", concat("", [hint, ".", "port_ranges"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+fw_rule_iap_payload_assert_ingress_rules_element_allow_rules_element_ip_protocol(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+fw_rule_iap_payload_assert_ingress_rules_element_allow_rules_element_port_ranges(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [fw_rule_iap_payload_assert_ingress_rules_element_allow_rules_element_port_ranges_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+fw_rule_iap_payload_assert_ingress_rules_element_allow_rules_element_port_ranges_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "from", "number", hint),
+		assertion.has_typed_key(x[key], "to", "number", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		fw_rule_iap_payload_assert_ingress_rules_element_allow_rules_element_port_ranges_element_from(x[key], "from", concat("", [hint, ".", "from"])),
+		fw_rule_iap_payload_assert_ingress_rules_element_allow_rules_element_port_ranges_element_to(x[key], "to", concat("", [hint, ".", "to"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+fw_rule_iap_payload_assert_ingress_rules_element_allow_rules_element_port_ranges_element_from(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+fw_rule_iap_payload_assert_ingress_rules_element_allow_rules_element_port_ranges_element_to(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+fw_rule_iap_payload_assert_ingress_rules_element_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+fw_rule_iap_payload_assert_ingress_rules_element_source_ranges(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [fw_rule_iap_payload_assert_ingress_rules_element_source_ranges_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+fw_rule_iap_payload_assert_ingress_rules_element_source_ranges_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

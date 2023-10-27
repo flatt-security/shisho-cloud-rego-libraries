@@ -4,6 +4,10 @@
 package shisho.decision.aws.ecs
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure root filesystem operation by ECS containers is limited to read-only access
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_ecs_container_fs_permission".
 container_fs_permission(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": container_fs_permission_header({
 			"allowed": d.allowed,
@@ -96,6 +101,52 @@ container_fs_permission_allowed(h) {
 #     "containers": [{"container_name": "example", "is_root_fs_readonly": false}],
 #   }
 #   ```
-container_fs_permission_payload(edata) = x {
+container_fs_permission_payload(edata) := x {
+	container_fs_permission_payload_assert(edata, "<the argument to container_fs_permission_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+container_fs_permission_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "containers", concat("", [hint, ".", "containers"]))]
+	every c in key_checks { c }
+
+	value_checks := [container_fs_permission_payload_assert_containers(edata, "containers", concat("", [hint, ".", "containers"]))]
+	every c in value_checks { c }
+} else := false
+
+container_fs_permission_payload_assert_containers(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [container_fs_permission_payload_assert_containers_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+container_fs_permission_payload_assert_containers_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "container_name", "string", hint),
+		assertion.has_typed_key(x[key], "is_root_fs_readonly", "boolean", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		container_fs_permission_payload_assert_containers_element_container_name(x[key], "container_name", concat("", [hint, ".", "container_name"])),
+		container_fs_permission_payload_assert_containers_element_is_root_fs_readonly(x[key], "is_root_fs_readonly", concat("", [hint, ".", "is_root_fs_readonly"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+container_fs_permission_payload_assert_containers_element_container_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+container_fs_permission_payload_assert_containers_element_is_root_fs_readonly(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

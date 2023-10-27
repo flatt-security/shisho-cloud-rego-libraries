@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that all the expired SSL/TLS certificates stored in AWS IAM are removed
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_server_certificates".
 server_certificates(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": server_certificates_header({
 			"allowed": d.allowed,
@@ -99,6 +104,31 @@ server_certificates_allowed(h) {
 #     "name": "example",
 #   }
 #   ```
-server_certificates_payload(edata) = x {
+server_certificates_payload(edata) := x {
+	server_certificates_payload_assert(edata, "<the argument to server_certificates_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+server_certificates_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "expired_at", concat("", [hint, ".", "expired_at"])),
+		assertion.has_key(edata, "name", concat("", [hint, ".", "name"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		server_certificates_payload_assert_expired_at(edata, "expired_at", concat("", [hint, ".", "expired_at"])),
+		server_certificates_payload_assert_name(edata, "name", concat("", [hint, ".", "name"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+server_certificates_payload_assert_expired_at(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+server_certificates_payload_assert_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

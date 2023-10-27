@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.credential
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure API Keys are restricted to usage by only specified hosts and apps
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_credential_api_keys_restriction".
 api_keys_restriction(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": api_keys_restriction_header({
 			"allowed": d.allowed,
@@ -99,9 +104,47 @@ api_keys_restriction_allowed(h) {
 #     "restriction_type": RESTRICTION_TYPE_NO_RESTRICTION,
 #   }
 #   ```
-api_keys_restriction_payload(edata) = x {
+api_keys_restriction_payload(edata) := x {
+	api_keys_restriction_payload_assert(edata, "<the argument to api_keys_restriction_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+api_keys_restriction_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "permissive_values", concat("", [hint, ".", "permissive_values"])),
+		assertion.has_key(edata, "restriction_type", concat("", [hint, ".", "restriction_type"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		api_keys_restriction_payload_assert_permissive_values(edata, "permissive_values", concat("", [hint, ".", "permissive_values"])),
+		api_keys_restriction_payload_assert_restriction_type(edata, "restriction_type", concat("", [hint, ".", "restriction_type"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+api_keys_restriction_payload_assert_permissive_values(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [api_keys_restriction_payload_assert_permissive_values_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+api_keys_restriction_payload_assert_permissive_values_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+api_keys_restriction_payload_assert_restriction_type(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
 
 RESTRICTION_TYPE_NO_RESTRICTION = 0
 

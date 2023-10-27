@@ -4,6 +4,10 @@
 package shisho.decision.aws.cloudfront
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that HTTPS connections to CloudFront distribution origins use secure SSL/TLS protocols
 # You can emit this decision as follows:
@@ -22,7 +26,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.aws.cloudfront.origin_transport_version_payload({
-#       "origins": [{"id": "example", "domain_id": "example", "protocol_policy": "example", "ssl_protocols": ["example"]}],
+#       "origins": [{"id": "example", "domain_name": "example", "protocol_policy": "example", "ssl_protocols": ["example"]}],
 #     }),
 #   })
 # }
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_cloudfront_origin_transport_version".
 origin_transport_version(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": origin_transport_version_header({
 			"allowed": d.allowed,
@@ -88,14 +93,85 @@ origin_transport_version_allowed(h) {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_cloudfront_origin_transport_version
 #
 #   The parameter `data` is an object with the following fields: 
-#   - origins: {"id": string, "domain_id": string, "protocol_policy": string, "ssl_protocols": string}
+#   - origins: {"id": string, "domain_name": string, "protocol_policy": string, "ssl_protocols": string}
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "origins": [{"id": "example", "domain_id": "example", "protocol_policy": "example", "ssl_protocols": ["example"]}],
+#     "origins": [{"id": "example", "domain_name": "example", "protocol_policy": "example", "ssl_protocols": ["example"]}],
 #   }
 #   ```
-origin_transport_version_payload(edata) = x {
+origin_transport_version_payload(edata) := x {
+	origin_transport_version_payload_assert(edata, "<the argument to origin_transport_version_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+origin_transport_version_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "origins", concat("", [hint, ".", "origins"]))]
+	every c in key_checks { c }
+
+	value_checks := [origin_transport_version_payload_assert_origins(edata, "origins", concat("", [hint, ".", "origins"]))]
+	every c in value_checks { c }
+} else := false
+
+origin_transport_version_payload_assert_origins(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [origin_transport_version_payload_assert_origins_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+origin_transport_version_payload_assert_origins_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "id", "string", hint),
+		assertion.has_typed_key(x[key], "domain_name", "string", hint),
+		assertion.has_typed_key(x[key], "protocol_policy", "string", hint),
+		assertion.has_typed_key(x[key], "ssl_protocols", "array", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		origin_transport_version_payload_assert_origins_element_id(x[key], "id", concat("", [hint, ".", "id"])),
+		origin_transport_version_payload_assert_origins_element_domain_name(x[key], "domain_name", concat("", [hint, ".", "domain_name"])),
+		origin_transport_version_payload_assert_origins_element_protocol_policy(x[key], "protocol_policy", concat("", [hint, ".", "protocol_policy"])),
+		origin_transport_version_payload_assert_origins_element_ssl_protocols(x[key], "ssl_protocols", concat("", [hint, ".", "ssl_protocols"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+origin_transport_version_payload_assert_origins_element_domain_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+origin_transport_version_payload_assert_origins_element_id(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+origin_transport_version_payload_assert_origins_element_protocol_policy(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+origin_transport_version_payload_assert_origins_element_ssl_protocols(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [origin_transport_version_payload_assert_origins_element_ssl_protocols_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+origin_transport_version_payload_assert_origins_element_ssl_protocols_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

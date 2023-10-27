@@ -4,6 +4,10 @@
 package shisho.decision.aws.cloudfront
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure CloudFront distributions have a default root object
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_cloudfront_default_root_object".
 default_root_object(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": default_root_object_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ default_root_object_allowed(h) {
 #     "default_root_object": "example",
 #   }
 #   ```
-default_root_object_payload(edata) = x {
+default_root_object_payload(edata) := x {
+	default_root_object_payload_assert(edata, "<the argument to default_root_object_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+default_root_object_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "default_root_object", concat("", [hint, ".", "default_root_object"]))]
+	every c in key_checks { c }
+
+	value_checks := [default_root_object_payload_assert_default_root_object(edata, "default_root_object", concat("", [hint, ".", "default_root_object"]))]
+	every c in value_checks { c }
+} else := false
+
+default_root_object_payload_assert_default_root_object(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

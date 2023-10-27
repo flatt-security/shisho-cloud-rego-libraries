@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.compute
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Compute Engine instances block project-wide SSH keys
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_compute_instance_project_wide_key_management".
 instance_project_wide_key_management(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_project_wide_key_management_header({
 			"allowed": d.allowed,
@@ -99,6 +104,31 @@ instance_project_wide_key_management_allowed(h) {
 #     "project_wide_key_available": false,
 #   }
 #   ```
-instance_project_wide_key_management_payload(edata) = x {
+instance_project_wide_key_management_payload(edata) := x {
+	instance_project_wide_key_management_payload_assert(edata, "<the argument to instance_project_wide_key_management_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_project_wide_key_management_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "blocked", concat("", [hint, ".", "blocked"])),
+		assertion.has_key(edata, "project_wide_key_available", concat("", [hint, ".", "project_wide_key_available"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		instance_project_wide_key_management_payload_assert_blocked(edata, "blocked", concat("", [hint, ".", "blocked"])),
+		instance_project_wide_key_management_payload_assert_project_wide_key_available(edata, "project_wide_key_available", concat("", [hint, ".", "project_wide_key_available"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+instance_project_wide_key_management_payload_assert_blocked(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+instance_project_wide_key_management_payload_assert_project_wide_key_available(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

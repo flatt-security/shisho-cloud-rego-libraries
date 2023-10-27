@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.networking
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure SSH access to Google Cloud resources is restricted from the Internet
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_networking_ssh_access".
 ssh_access(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": ssh_access_header({
 			"allowed": d.allowed,
@@ -97,6 +102,42 @@ ssh_access_allowed(h) {
 #     "exposed_surfaces": [{"network_self_link": "example"}],
 #   }
 #   ```
-ssh_access_payload(edata) = x {
+ssh_access_payload(edata) := x {
+	ssh_access_payload_assert(edata, "<the argument to ssh_access_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+ssh_access_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "exposed_surfaces", concat("", [hint, ".", "exposed_surfaces"]))]
+	every c in key_checks { c }
+
+	value_checks := [ssh_access_payload_assert_exposed_surfaces(edata, "exposed_surfaces", concat("", [hint, ".", "exposed_surfaces"]))]
+	every c in value_checks { c }
+} else := false
+
+ssh_access_payload_assert_exposed_surfaces(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [ssh_access_payload_assert_exposed_surfaces_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+ssh_access_payload_assert_exposed_surfaces_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [assertion.has_typed_key(x[key], "network_self_link", "string", hint)]
+	every c in key_checks { c }
+	value_checks := [ssh_access_payload_assert_exposed_surfaces_element_network_self_link(x[key], "network_self_link", concat("", [hint, ".", "network_self_link"]))]
+	every c in value_checks { c }
+} else := false
+
+ssh_access_payload_assert_exposed_surfaces_element_network_self_link(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

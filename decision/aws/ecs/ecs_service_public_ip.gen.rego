@@ -4,6 +4,10 @@
 package shisho.decision.aws.ecs
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure public IP addresses are not assigned to ECS services automatically
 # You can emit this decision as follows:
@@ -22,8 +26,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.aws.ecs.service_public_ip_payload({
-#       "launch_type": "example",
-#       "public_ip_assigned": false,
+#       "public_ip_assigned": "example",
 #       "security_groups": ["example"],
 #       "subnets": ["example"],
 #     }),
@@ -37,6 +40,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_ecs_service_public_ip".
 service_public_ip(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": service_public_ip_header({
 			"allowed": d.allowed,
@@ -91,20 +95,75 @@ service_public_ip_allowed(h) {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_ecs_service_public_ip
 #
 #   The parameter `data` is an object with the following fields: 
-#   - launch_type: string
-#   - public_ip_assigned: boolean
+#   - public_ip_assigned: string
 #   - security_groups: string
 #   - subnets: string
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "launch_type": "example",
-#     "public_ip_assigned": false,
+#     "public_ip_assigned": "example",
 #     "security_groups": ["example"],
 #     "subnets": ["example"],
 #   }
 #   ```
-service_public_ip_payload(edata) = x {
+service_public_ip_payload(edata) := x {
+	service_public_ip_payload_assert(edata, "<the argument to service_public_ip_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+service_public_ip_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "public_ip_assigned", concat("", [hint, ".", "public_ip_assigned"])),
+		assertion.has_key(edata, "security_groups", concat("", [hint, ".", "security_groups"])),
+		assertion.has_key(edata, "subnets", concat("", [hint, ".", "subnets"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		service_public_ip_payload_assert_public_ip_assigned(edata, "public_ip_assigned", concat("", [hint, ".", "public_ip_assigned"])),
+		service_public_ip_payload_assert_security_groups(edata, "security_groups", concat("", [hint, ".", "security_groups"])),
+		service_public_ip_payload_assert_subnets(edata, "subnets", concat("", [hint, ".", "subnets"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+service_public_ip_payload_assert_public_ip_assigned(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+service_public_ip_payload_assert_security_groups(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [service_public_ip_payload_assert_security_groups_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+service_public_ip_payload_assert_security_groups_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+service_public_ip_payload_assert_subnets(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [service_public_ip_payload_assert_subnets_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+service_public_ip_payload_assert_subnets_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

@@ -4,6 +4,10 @@
 package shisho.decision.github
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Enforce two-factor authentication on GitHub organization(s)
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_org_2fa_status".
 org_2fa_status(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": org_2fa_status_header({
 			"allowed": d.allowed,
@@ -95,9 +100,24 @@ org_2fa_status_allowed(h) {
 #     "enabled": false,
 #   }
 #   ```
-org_2fa_status_payload(edata) = x {
+org_2fa_status_payload(edata) := x {
+	org_2fa_status_payload_assert(edata, "<the argument to org_2fa_status_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+org_2fa_status_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [org_2fa_status_payload_assert_enabled(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+org_2fa_status_payload_assert_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
 
 # @title Ensure strict base permissions are set for repositories
 # You can emit this decision as follows:
@@ -128,6 +148,7 @@ org_2fa_status_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_org_default_repository_permission".
 org_default_repository_permission(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": org_default_repository_permission_header({
 			"allowed": d.allowed,
@@ -189,9 +210,24 @@ org_default_repository_permission_allowed(h) {
 #     "current": "example",
 #   }
 #   ```
-org_default_repository_permission_payload(edata) = x {
+org_default_repository_permission_payload(edata) := x {
+	org_default_repository_permission_payload_assert(edata, "<the argument to org_default_repository_permission_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+org_default_repository_permission_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "current", concat("", [hint, ".", "current"]))]
+	every c in key_checks { c }
+
+	value_checks := [org_default_repository_permission_payload_assert_current(edata, "current", concat("", [hint, ".", "current"]))]
+	every c in value_checks { c }
+} else := false
+
+org_default_repository_permission_payload_assert_current(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure creation of GitHub public pages is restricted
 # You can emit this decision as follows:
@@ -222,6 +258,7 @@ org_default_repository_permission_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_org_members_permission_on_creating_public_pages".
 org_members_permission_on_creating_public_pages(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": org_members_permission_on_creating_public_pages_header({
 			"allowed": d.allowed,
@@ -280,9 +317,24 @@ org_members_permission_on_creating_public_pages_allowed(h) {
 #     "allowed": false,
 #   }
 #   ```
-org_members_permission_on_creating_public_pages_payload(edata) = x {
+org_members_permission_on_creating_public_pages_payload(edata) := x {
+	org_members_permission_on_creating_public_pages_payload_assert(edata, "<the argument to org_members_permission_on_creating_public_pages_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+org_members_permission_on_creating_public_pages_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "allowed", concat("", [hint, ".", "allowed"]))]
+	every c in key_checks { c }
+
+	value_checks := [org_members_permission_on_creating_public_pages_payload_assert_allowed(edata, "allowed", concat("", [hint, ".", "allowed"]))]
+	every c in value_checks { c }
+} else := false
+
+org_members_permission_on_creating_public_pages_payload_assert_allowed(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
 
 # @title Ensure public repository creation is limited to specific members
 # You can emit this decision as follows:
@@ -313,6 +365,7 @@ org_members_permission_on_creating_public_pages_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_org_members_permission_on_creating_public_repos".
 org_members_permission_on_creating_public_repos(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": org_members_permission_on_creating_public_repos_header({
 			"allowed": d.allowed,
@@ -374,9 +427,24 @@ org_members_permission_on_creating_public_repos_allowed(h) {
 #     "allowed": false,
 #   }
 #   ```
-org_members_permission_on_creating_public_repos_payload(edata) = x {
+org_members_permission_on_creating_public_repos_payload(edata) := x {
+	org_members_permission_on_creating_public_repos_payload_assert(edata, "<the argument to org_members_permission_on_creating_public_repos_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+org_members_permission_on_creating_public_repos_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "allowed", concat("", [hint, ".", "allowed"]))]
+	every c in key_checks { c }
+
+	value_checks := [org_members_permission_on_creating_public_repos_payload_assert_allowed(edata, "allowed", concat("", [hint, ".", "allowed"]))]
+	every c in value_checks { c }
+} else := false
+
+org_members_permission_on_creating_public_repos_payload_assert_allowed(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
 
 # @title Ensure forking of GitHub repositories is restricted
 # You can emit this decision as follows:
@@ -407,6 +475,7 @@ org_members_permission_on_creating_public_repos_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_org_members_permission_on_private_forking".
 org_members_permission_on_private_forking(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": org_members_permission_on_private_forking_header({
 			"allowed": d.allowed,
@@ -465,9 +534,24 @@ org_members_permission_on_private_forking_allowed(h) {
 #     "allowed": false,
 #   }
 #   ```
-org_members_permission_on_private_forking_payload(edata) = x {
+org_members_permission_on_private_forking_payload(edata) := x {
+	org_members_permission_on_private_forking_payload_assert(edata, "<the argument to org_members_permission_on_private_forking_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+org_members_permission_on_private_forking_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "allowed", concat("", [hint, ".", "allowed"]))]
+	every c in key_checks { c }
+
+	value_checks := [org_members_permission_on_private_forking_payload_assert_allowed(edata, "allowed", concat("", [hint, ".", "allowed"]))]
+	every c in value_checks { c }
+} else := false
+
+org_members_permission_on_private_forking_payload_assert_allowed(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
 
 # @title Ensure minimum number of administrators are set for the organization
 # You can emit this decision as follows:
@@ -498,6 +582,7 @@ org_members_permission_on_private_forking_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_org_owners".
 org_owners(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": org_owners_header({
 			"allowed": d.allowed,
@@ -559,6 +644,34 @@ org_owners_allowed(h) {
 #     "admins": ["example"],
 #   }
 #   ```
-org_owners_payload(edata) = x {
+org_owners_payload(edata) := x {
+	org_owners_payload_assert(edata, "<the argument to org_owners_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+org_owners_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "admins", concat("", [hint, ".", "admins"]))]
+	every c in key_checks { c }
+
+	value_checks := [org_owners_payload_assert_admins(edata, "admins", concat("", [hint, ".", "admins"]))]
+	every c in value_checks { c }
+} else := false
+
+org_owners_payload_assert_admins(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [org_owners_payload_assert_admins_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+org_owners_payload_assert_admins_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

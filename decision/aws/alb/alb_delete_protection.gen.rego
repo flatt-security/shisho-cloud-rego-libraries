@@ -4,6 +4,10 @@
 package shisho.decision.aws.alb
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Application Load Balancer deletion protection is enabled
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_alb_delete_protection".
 delete_protection(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": delete_protection_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ delete_protection_allowed(h) {
 #     "deletion_protection_enabled": false,
 #   }
 #   ```
-delete_protection_payload(edata) = x {
+delete_protection_payload(edata) := x {
+	delete_protection_payload_assert(edata, "<the argument to delete_protection_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+delete_protection_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "deletion_protection_enabled", concat("", [hint, ".", "deletion_protection_enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [delete_protection_payload_assert_deletion_protection_enabled(edata, "deletion_protection_enabled", concat("", [hint, ".", "deletion_protection_enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+delete_protection_payload_assert_deletion_protection_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

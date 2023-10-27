@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure access keys during initial user setup for all IAM users with a console password
 # You can emit this decision as follows:
@@ -37,6 +41,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_console_user_keys".
 console_user_keys(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": console_user_keys_header({
 			"allowed": d.allowed,
@@ -105,6 +110,43 @@ console_user_keys_allowed(h) {
 #     "has_unused_console_password": false,
 #   }
 #   ```
-console_user_keys_payload(edata) = x {
+console_user_keys_payload(edata) := x {
+	console_user_keys_payload_assert(edata, "<the argument to console_user_keys_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+console_user_keys_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "has_access_key", concat("", [hint, ".", "has_access_key"])),
+		assertion.has_key(edata, "has_console_password", concat("", [hint, ".", "has_console_password"])),
+		assertion.has_key(edata, "has_unused_access_key", concat("", [hint, ".", "has_unused_access_key"])),
+		assertion.has_key(edata, "has_unused_console_password", concat("", [hint, ".", "has_unused_console_password"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		console_user_keys_payload_assert_has_access_key(edata, "has_access_key", concat("", [hint, ".", "has_access_key"])),
+		console_user_keys_payload_assert_has_console_password(edata, "has_console_password", concat("", [hint, ".", "has_console_password"])),
+		console_user_keys_payload_assert_has_unused_access_key(edata, "has_unused_access_key", concat("", [hint, ".", "has_unused_access_key"])),
+		console_user_keys_payload_assert_has_unused_console_password(edata, "has_unused_console_password", concat("", [hint, ".", "has_unused_console_password"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+console_user_keys_payload_assert_has_access_key(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+console_user_keys_payload_assert_has_console_password(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+console_user_keys_payload_assert_has_unused_access_key(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+console_user_keys_payload_assert_has_unused_console_password(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

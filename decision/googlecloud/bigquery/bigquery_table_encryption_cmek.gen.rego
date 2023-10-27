@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.bigquery
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure BigQuery datasets have default Customer-Managed Encryption Keys (CMEK)
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_bigquery_table_encryption_cmek".
 table_encryption_cmek(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": table_encryption_cmek_header({
 			"allowed": d.allowed,
@@ -99,6 +104,31 @@ table_encryption_cmek_allowed(h) {
 #     "uses_default_key": false,
 #   }
 #   ```
-table_encryption_cmek_payload(edata) = x {
+table_encryption_cmek_payload(edata) := x {
+	table_encryption_cmek_payload_assert(edata, "<the argument to table_encryption_cmek_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+table_encryption_cmek_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "key_name", concat("", [hint, ".", "key_name"])),
+		assertion.has_key(edata, "uses_default_key", concat("", [hint, ".", "uses_default_key"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		table_encryption_cmek_payload_assert_key_name(edata, "key_name", concat("", [hint, ".", "key_name"])),
+		table_encryption_cmek_payload_assert_uses_default_key(edata, "uses_default_key", concat("", [hint, ".", "uses_default_key"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+table_encryption_cmek_payload_assert_key_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+table_encryption_cmek_payload_assert_uses_default_key(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

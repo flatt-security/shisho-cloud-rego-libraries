@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.sql
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that the log_disconnections database flag for Cloud SQL for PostgreSQL instance is set to On
 # You can emit this decision as follows:
@@ -22,7 +26,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.sql.instance_postgresql_log_disconnections_payload({
-#       "log_disconnection_state": "example",
+#       "log_disconnections_state": "example",
 #     }),
 #   })
 # }
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_sql_instance_postgresql_log_disconnections".
 instance_postgresql_log_disconnections(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_postgresql_log_disconnections_header({
 			"allowed": d.allowed,
@@ -88,14 +93,29 @@ instance_postgresql_log_disconnections_allowed(h) {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_sql_instance_postgresql_log_disconnections
 #
 #   The parameter `data` is an object with the following fields: 
-#   - log_disconnection_state: string
+#   - log_disconnections_state: string
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "log_disconnection_state": "example",
+#     "log_disconnections_state": "example",
 #   }
 #   ```
-instance_postgresql_log_disconnections_payload(edata) = x {
+instance_postgresql_log_disconnections_payload(edata) := x {
+	instance_postgresql_log_disconnections_payload_assert(edata, "<the argument to instance_postgresql_log_disconnections_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_postgresql_log_disconnections_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "log_disconnections_state", concat("", [hint, ".", "log_disconnections_state"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_postgresql_log_disconnections_payload_assert_log_disconnections_state(edata, "log_disconnections_state", concat("", [hint, ".", "log_disconnections_state"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_postgresql_log_disconnections_payload_assert_log_disconnections_state(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

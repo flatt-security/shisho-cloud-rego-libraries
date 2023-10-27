@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.sql
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that the contained_db_authentication_state  database flag a Cloud SQL for SQL Server instance is set to off
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_sql_instance_sqlserver_contained_db_authentication".
 instance_sqlserver_contained_db_authentication(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_sqlserver_contained_db_authentication_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ instance_sqlserver_contained_db_authentication_allowed(h) {
 #     "contained_db_authentication_state": "example",
 #   }
 #   ```
-instance_sqlserver_contained_db_authentication_payload(edata) = x {
+instance_sqlserver_contained_db_authentication_payload(edata) := x {
+	instance_sqlserver_contained_db_authentication_payload_assert(edata, "<the argument to instance_sqlserver_contained_db_authentication_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_sqlserver_contained_db_authentication_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "contained_db_authentication_state", concat("", [hint, ".", "contained_db_authentication_state"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_sqlserver_contained_db_authentication_payload_assert_contained_db_authentication_state(edata, "contained_db_authentication_state", concat("", [hint, ".", "contained_db_authentication_state"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_sqlserver_contained_db_authentication_payload_assert_contained_db_authentication_state(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

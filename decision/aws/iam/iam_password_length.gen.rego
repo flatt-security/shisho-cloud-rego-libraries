@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure IAM password policy requires enough minimum length
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_password_length".
 password_length(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": password_length_header({
 			"allowed": d.allowed,
@@ -100,6 +105,31 @@ password_length_allowed(h) {
 #     "minimum_length_policy_recommendation": 0,
 #   }
 #   ```
-password_length_payload(edata) = x {
+password_length_payload(edata) := x {
+	password_length_payload_assert(edata, "<the argument to password_length_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+password_length_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "current_minimum_length", concat("", [hint, ".", "current_minimum_length"])),
+		assertion.has_key(edata, "minimum_length_policy_recommendation", concat("", [hint, ".", "minimum_length_policy_recommendation"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		password_length_payload_assert_current_minimum_length(edata, "current_minimum_length", concat("", [hint, ".", "current_minimum_length"])),
+		password_length_payload_assert_minimum_length_policy_recommendation(edata, "minimum_length_policy_recommendation", concat("", [hint, ".", "minimum_length_policy_recommendation"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+password_length_payload_assert_current_minimum_length(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+password_length_payload_assert_minimum_length_policy_recommendation(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false

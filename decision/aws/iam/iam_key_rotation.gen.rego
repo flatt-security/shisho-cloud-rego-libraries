@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure AWS IAM access keys are rotated per pre-defined time window
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_key_rotation".
 key_rotation(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": key_rotation_header({
 			"allowed": d.allowed,
@@ -100,6 +105,62 @@ key_rotation_allowed(h) {
 #     "recommended_rotation_window_days": 0,
 #   }
 #   ```
-key_rotation_payload(edata) = x {
+key_rotation_payload(edata) := x {
+	key_rotation_payload_assert(edata, "<the argument to key_rotation_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+key_rotation_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "keys_requiring_rotation", concat("", [hint, ".", "keys_requiring_rotation"])),
+		assertion.has_key(edata, "recommended_rotation_window_days", concat("", [hint, ".", "recommended_rotation_window_days"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		key_rotation_payload_assert_keys_requiring_rotation(edata, "keys_requiring_rotation", concat("", [hint, ".", "keys_requiring_rotation"])),
+		key_rotation_payload_assert_recommended_rotation_window_days(edata, "recommended_rotation_window_days", concat("", [hint, ".", "recommended_rotation_window_days"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+key_rotation_payload_assert_keys_requiring_rotation(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [key_rotation_payload_assert_keys_requiring_rotation_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+key_rotation_payload_assert_keys_requiring_rotation_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "id", "string", hint),
+		assertion.has_typed_key(x[key], "created_at", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		key_rotation_payload_assert_keys_requiring_rotation_element_id(x[key], "id", concat("", [hint, ".", "id"])),
+		key_rotation_payload_assert_keys_requiring_rotation_element_created_at(x[key], "created_at", concat("", [hint, ".", "created_at"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+key_rotation_payload_assert_keys_requiring_rotation_element_created_at(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+key_rotation_payload_assert_keys_requiring_rotation_element_id(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+key_rotation_payload_assert_recommended_rotation_window_days(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false

@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.appengine
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure App Engine applications enforce HTTPS connections
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_appengine_http".
 http(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": http_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ http_allowed(h) {
 #     "accepted": false,
 #   }
 #   ```
-http_payload(edata) = x {
+http_payload(edata) := x {
+	http_payload_assert(edata, "<the argument to http_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+http_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "accepted", concat("", [hint, ".", "accepted"]))]
+	every c in key_checks { c }
+
+	value_checks := [http_payload_assert_accepted(edata, "accepted", concat("", [hint, ".", "accepted"]))]
+	every c in value_checks { c }
+} else := false
+
+http_payload_assert_accepted(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

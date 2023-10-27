@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure a support role has been created to manage incidents with AWS Support
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_role_for_support".
 role_for_support(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": role_for_support_header({
 			"allowed": d.allowed,
@@ -97,6 +102,34 @@ role_for_support_allowed(h) {
 #     "attached_roles": ["example"],
 #   }
 #   ```
-role_for_support_payload(edata) = x {
+role_for_support_payload(edata) := x {
+	role_for_support_payload_assert(edata, "<the argument to role_for_support_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+role_for_support_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "attached_roles", concat("", [hint, ".", "attached_roles"]))]
+	every c in key_checks { c }
+
+	value_checks := [role_for_support_payload_assert_attached_roles(edata, "attached_roles", concat("", [hint, ".", "attached_roles"]))]
+	every c in value_checks { c }
+} else := false
+
+role_for_support_payload_assert_attached_roles(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [role_for_support_payload_assert_attached_roles_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+role_for_support_payload_assert_attached_roles_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.sql
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that the log_connections database flag for Cloud SQL for PostgreSQL instance is set to On
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_sql_instance_postgresql_log_connections".
 instance_postgresql_log_connections(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_postgresql_log_connections_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ instance_postgresql_log_connections_allowed(h) {
 #     "log_connections_state": "example",
 #   }
 #   ```
-instance_postgresql_log_connections_payload(edata) = x {
+instance_postgresql_log_connections_payload(edata) := x {
+	instance_postgresql_log_connections_payload_assert(edata, "<the argument to instance_postgresql_log_connections_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_postgresql_log_connections_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "log_connections_state", concat("", [hint, ".", "log_connections_state"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_postgresql_log_connections_payload_assert_log_connections_state(edata, "log_connections_state", concat("", [hint, ".", "log_connections_state"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_postgresql_log_connections_payload_assert_log_connections_state(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

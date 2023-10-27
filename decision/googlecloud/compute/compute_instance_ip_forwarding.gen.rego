@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.compute
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure IP forwarding is disabled for Compute Engine instances
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_compute_instance_ip_forwarding".
 instance_ip_forwarding(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_ip_forwarding_header({
 			"allowed": d.allowed,
@@ -67,7 +72,8 @@ instance_ip_forwarding_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:googlecloud/cis-benchmark/v1.3.0": "4.6",
-			"decision.api.shisho.dev:needs-manual-review": "true",
+			"decision.api.shisho.dev:googlecloud/scc-premium/latest": "COMPUTE_INSTANCE_SCANNER.IP_FORWARDING_ENABLED",
+			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
 		"type": shisho.decision.as_decision_type(instance_ip_forwarding_allowed(h)),
@@ -96,6 +102,21 @@ instance_ip_forwarding_allowed(h) {
 #     "forwarding_enabled": false,
 #   }
 #   ```
-instance_ip_forwarding_payload(edata) = x {
+instance_ip_forwarding_payload(edata) := x {
+	instance_ip_forwarding_payload_assert(edata, "<the argument to instance_ip_forwarding_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_ip_forwarding_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "forwarding_enabled", concat("", [hint, ".", "forwarding_enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_ip_forwarding_payload_assert_forwarding_enabled(edata, "forwarding_enabled", concat("", [hint, ".", "forwarding_enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_ip_forwarding_payload_assert_forwarding_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

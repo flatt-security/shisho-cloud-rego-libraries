@@ -4,6 +4,10 @@
 package shisho.decision.github
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure the deletion of protected branches is limited
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_branch_deletion_policy".
 branch_deletion_policy(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": branch_deletion_policy_header({
 			"allowed": d.allowed,
@@ -98,9 +103,34 @@ branch_deletion_policy_allowed(h) {
 #     "subject_branch": "example",
 #   }
 #   ```
-branch_deletion_policy_payload(edata) = x {
+branch_deletion_policy_payload(edata) := x {
+	branch_deletion_policy_payload_assert(edata, "<the argument to branch_deletion_policy_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+branch_deletion_policy_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "allowed", concat("", [hint, ".", "allowed"])),
+		assertion.has_key(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		branch_deletion_policy_payload_assert_allowed(edata, "allowed", concat("", [hint, ".", "allowed"])),
+		branch_deletion_policy_payload_assert_subject_branch(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+branch_deletion_policy_payload_assert_allowed(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+branch_deletion_policy_payload_assert_subject_branch(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure code owner’s review is required when a change affects owned code
 # You can emit this decision as follows:
@@ -132,6 +162,7 @@ branch_deletion_policy_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_code_owners_review_policy".
 code_owners_review_policy(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": code_owners_review_policy_header({
 			"allowed": d.allowed,
@@ -195,9 +226,34 @@ code_owners_review_policy_allowed(h) {
 #     "subject_branch": "example",
 #   }
 #   ```
-code_owners_review_policy_payload(edata) = x {
+code_owners_review_policy_payload(edata) := x {
+	code_owners_review_policy_payload_assert(edata, "<the argument to code_owners_review_policy_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+code_owners_review_policy_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "required", concat("", [hint, ".", "required"])),
+		assertion.has_key(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		code_owners_review_policy_payload_assert_required(edata, "required", concat("", [hint, ".", "required"])),
+		code_owners_review_policy_payload_assert_subject_branch(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+code_owners_review_policy_payload_assert_required(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+code_owners_review_policy_payload_assert_subject_branch(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure verification of signed commits for new changes before merging
 # You can emit this decision as follows:
@@ -229,6 +285,7 @@ code_owners_review_policy_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_commit_signature_policy".
 commit_signature_policy(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": commit_signature_policy_header({
 			"allowed": d.allowed,
@@ -292,9 +349,34 @@ commit_signature_policy_allowed(h) {
 #     "subject_branch": "example",
 #   }
 #   ```
-commit_signature_policy_payload(edata) = x {
+commit_signature_policy_payload(edata) := x {
+	commit_signature_policy_payload_assert(edata, "<the argument to commit_signature_policy_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+commit_signature_policy_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "required", concat("", [hint, ".", "required"])),
+		assertion.has_key(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		commit_signature_policy_payload_assert_required(edata, "required", concat("", [hint, ".", "required"])),
+		commit_signature_policy_payload_assert_subject_branch(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+commit_signature_policy_payload_assert_required(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+commit_signature_policy_payload_assert_subject_branch(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Keep a default branch protected by branch protection rule(s)
 # You can emit this decision as follows:
@@ -325,6 +407,7 @@ commit_signature_policy_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_default_branch_protection".
 default_branch_protection(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": default_branch_protection_header({
 			"allowed": d.allowed,
@@ -386,9 +469,24 @@ default_branch_protection_allowed(h) {
 #     "default_branch_name": "example",
 #   }
 #   ```
-default_branch_protection_payload(edata) = x {
+default_branch_protection_payload(edata) := x {
+	default_branch_protection_payload_assert(edata, "<the argument to default_branch_protection_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+default_branch_protection_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "default_branch_name", concat("", [hint, ".", "default_branch_name"]))]
+	every c in key_checks { c }
+
+	value_checks := [default_branch_protection_payload_assert_default_branch_name(edata, "default_branch_name", concat("", [hint, ".", "default_branch_name"]))]
+	every c in value_checks { c }
+} else := false
+
+default_branch_protection_payload_assert_default_branch_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure force push code to branches is denied
 # You can emit this decision as follows:
@@ -420,6 +518,7 @@ default_branch_protection_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_force_push_policy".
 force_push_policy(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": force_push_policy_header({
 			"allowed": d.allowed,
@@ -483,9 +582,34 @@ force_push_policy_allowed(h) {
 #     "subject_branch": "example",
 #   }
 #   ```
-force_push_policy_payload(edata) = x {
+force_push_policy_payload(edata) := x {
+	force_push_policy_payload_assert(edata, "<the argument to force_push_policy_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+force_push_policy_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "allowed", concat("", [hint, ".", "allowed"])),
+		assertion.has_key(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		force_push_policy_payload_assert_allowed(edata, "allowed", concat("", [hint, ".", "allowed"])),
+		force_push_policy_payload_assert_subject_branch(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+force_push_policy_payload_assert_allowed(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+force_push_policy_payload_assert_subject_branch(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure linear history is required
 # You can emit this decision as follows:
@@ -517,6 +641,7 @@ force_push_policy_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_linear_history_policy".
 linear_history_policy(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": linear_history_policy_header({
 			"allowed": d.allowed,
@@ -580,9 +705,34 @@ linear_history_policy_allowed(h) {
 #     "subject_branch": "example",
 #   }
 #   ```
-linear_history_policy_payload(edata) = x {
+linear_history_policy_payload(edata) := x {
+	linear_history_policy_payload_assert(edata, "<the argument to linear_history_policy_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+linear_history_policy_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "required", concat("", [hint, ".", "required"])),
+		assertion.has_key(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		linear_history_policy_payload_assert_required(edata, "required", concat("", [hint, ".", "required"])),
+		linear_history_policy_payload_assert_subject_branch(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+linear_history_policy_payload_assert_required(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+linear_history_policy_payload_assert_subject_branch(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure any change to code receives the enough number of approvals by authenticated users
 # You can emit this decision as follows:
@@ -614,6 +764,7 @@ linear_history_policy_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_minimum_approval_number_policy".
 minimum_approval_number_policy(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": minimum_approval_number_policy_header({
 			"allowed": d.allowed,
@@ -677,9 +828,34 @@ minimum_approval_number_policy_allowed(h) {
 #     "subject_branch": "example",
 #   }
 #   ```
-minimum_approval_number_policy_payload(edata) = x {
+minimum_approval_number_policy_payload(edata) := x {
+	minimum_approval_number_policy_payload_assert(edata, "<the argument to minimum_approval_number_policy_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+minimum_approval_number_policy_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "required_approval_count", concat("", [hint, ".", "required_approval_count"])),
+		assertion.has_key(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		minimum_approval_number_policy_payload_assert_required_approval_count(edata, "required_approval_count", concat("", [hint, ".", "required_approval_count"])),
+		minimum_approval_number_policy_payload_assert_subject_branch(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+minimum_approval_number_policy_payload_assert_required_approval_count(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+minimum_approval_number_policy_payload_assert_subject_branch(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure branch protection rules are enforced for administrators
 # You can emit this decision as follows:
@@ -711,6 +887,7 @@ minimum_approval_number_policy_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_protection_enforcement_for_admins".
 protection_enforcement_for_admins(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": protection_enforcement_for_admins_header({
 			"allowed": d.allowed,
@@ -774,9 +951,34 @@ protection_enforcement_for_admins_allowed(h) {
 #     "subject_branch": "example",
 #   }
 #   ```
-protection_enforcement_for_admins_payload(edata) = x {
+protection_enforcement_for_admins_payload(edata) := x {
+	protection_enforcement_for_admins_payload_assert(edata, "<the argument to protection_enforcement_for_admins_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+protection_enforcement_for_admins_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "allowed", concat("", [hint, ".", "allowed"])),
+		assertion.has_key(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		protection_enforcement_for_admins_payload_assert_allowed(edata, "allowed", concat("", [hint, ".", "allowed"])),
+		protection_enforcement_for_admins_payload_assert_subject_branch(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+protection_enforcement_for_admins_payload_assert_allowed(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+protection_enforcement_for_admins_payload_assert_subject_branch(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure minimum number of administrators are set for the GitHub repository
 # You can emit this decision as follows:
@@ -807,6 +1009,7 @@ protection_enforcement_for_admins_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_repo_admins".
 repo_admins(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": repo_admins_header({
 			"allowed": d.allowed,
@@ -868,9 +1071,37 @@ repo_admins_allowed(h) {
 #     "admins": ["example"],
 #   }
 #   ```
-repo_admins_payload(edata) = x {
+repo_admins_payload(edata) := x {
+	repo_admins_payload_assert(edata, "<the argument to repo_admins_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+repo_admins_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "admins", concat("", [hint, ".", "admins"]))]
+	every c in key_checks { c }
+
+	value_checks := [repo_admins_payload_assert_admins(edata, "admins", concat("", [hint, ".", "admins"]))]
+	every c in value_checks { c }
+} else := false
+
+repo_admins_payload_assert_admins(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [repo_admins_payload_assert_admins_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+repo_admins_payload_assert_admins_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure deletion of GitHub repositories is restricted
 # You can emit this decision as follows:
@@ -901,6 +1132,7 @@ repo_admins_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_repo_members_permission_on_deleting_repository".
 repo_members_permission_on_deleting_repository(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": repo_members_permission_on_deleting_repository_header({
 			"allowed": d.allowed,
@@ -962,9 +1194,37 @@ repo_members_permission_on_deleting_repository_allowed(h) {
 #     "allowed_users": ["example"],
 #   }
 #   ```
-repo_members_permission_on_deleting_repository_payload(edata) = x {
+repo_members_permission_on_deleting_repository_payload(edata) := x {
+	repo_members_permission_on_deleting_repository_payload_assert(edata, "<the argument to repo_members_permission_on_deleting_repository_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+repo_members_permission_on_deleting_repository_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "allowed_users", concat("", [hint, ".", "allowed_users"]))]
+	every c in key_checks { c }
+
+	value_checks := [repo_members_permission_on_deleting_repository_payload_assert_allowed_users(edata, "allowed_users", concat("", [hint, ".", "allowed_users"]))]
+	every c in value_checks { c }
+} else := false
+
+repo_members_permission_on_deleting_repository_payload_assert_allowed_users(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [repo_members_permission_on_deleting_repository_payload_assert_allowed_users_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+repo_members_permission_on_deleting_repository_payload_assert_allowed_users_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure previous approvals are dismissed when updates are introduced to a code change proposal
 # You can emit this decision as follows:
@@ -996,6 +1256,7 @@ repo_members_permission_on_deleting_repository_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_stale_review_policy".
 stale_review_policy(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": stale_review_policy_header({
 			"allowed": d.allowed,
@@ -1059,6 +1320,31 @@ stale_review_policy_allowed(h) {
 #     "subject_branch": "example",
 #   }
 #   ```
-stale_review_policy_payload(edata) = x {
+stale_review_policy_payload(edata) := x {
+	stale_review_policy_payload_assert(edata, "<the argument to stale_review_policy_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+stale_review_policy_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "enforced", concat("", [hint, ".", "enforced"])),
+		assertion.has_key(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		stale_review_policy_payload_assert_enforced(edata, "enforced", concat("", [hint, ".", "enforced"])),
+		stale_review_policy_payload_assert_subject_branch(edata, "subject_branch", concat("", [hint, ".", "subject_branch"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+stale_review_policy_payload_assert_enforced(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+stale_review_policy_payload_assert_subject_branch(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

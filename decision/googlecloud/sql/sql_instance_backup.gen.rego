@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.sql
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Cloud SQL instances use automatic backups
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_sql_instance_backup".
 instance_backup(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_backup_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ instance_backup_allowed(h) {
 #     "auto_backup_enabled": false,
 #   }
 #   ```
-instance_backup_payload(edata) = x {
+instance_backup_payload(edata) := x {
+	instance_backup_payload_assert(edata, "<the argument to instance_backup_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_backup_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "auto_backup_enabled", concat("", [hint, ".", "auto_backup_enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_backup_payload_assert_auto_backup_enabled(edata, "auto_backup_enabled", concat("", [hint, ".", "auto_backup_enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_backup_payload_assert_auto_backup_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

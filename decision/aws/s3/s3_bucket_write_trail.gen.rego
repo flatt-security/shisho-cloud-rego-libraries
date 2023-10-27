@@ -4,6 +4,10 @@
 package shisho.decision.aws.s3
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure CloudTrail trails are logging S3 bucket data write events
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_s3_bucket_write_trail".
 bucket_write_trail(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": bucket_write_trail_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ bucket_write_trail_allowed(h) {
 #     "enabled": false,
 #   }
 #   ```
-bucket_write_trail_payload(edata) = x {
+bucket_write_trail_payload(edata) := x {
+	bucket_write_trail_payload_assert(edata, "<the argument to bucket_write_trail_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+bucket_write_trail_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [bucket_write_trail_payload_assert_enabled(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+bucket_write_trail_payload_assert_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

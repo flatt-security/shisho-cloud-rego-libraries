@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Hardware MFA is enabled for the root user account
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_root_user_hardware_mfa".
 root_user_hardware_mfa(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": root_user_hardware_mfa_header({
 			"allowed": d.allowed,
@@ -97,6 +102,21 @@ root_user_hardware_mfa_allowed(h) {
 #     "hardware_mfa_enabled": false,
 #   }
 #   ```
-root_user_hardware_mfa_payload(edata) = x {
+root_user_hardware_mfa_payload(edata) := x {
+	root_user_hardware_mfa_payload_assert(edata, "<the argument to root_user_hardware_mfa_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+root_user_hardware_mfa_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "hardware_mfa_enabled", concat("", [hint, ".", "hardware_mfa_enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [root_user_hardware_mfa_payload_assert_hardware_mfa_enabled(edata, "hardware_mfa_enabled", concat("", [hint, ".", "hardware_mfa_enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+root_user_hardware_mfa_payload_assert_hardware_mfa_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

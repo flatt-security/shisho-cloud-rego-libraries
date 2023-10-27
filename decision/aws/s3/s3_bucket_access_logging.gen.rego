@@ -4,6 +4,10 @@
 package shisho.decision.aws.s3
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure access logging is enabled for important S3 buckets
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_s3_bucket_access_logging".
 bucket_access_logging(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": bucket_access_logging_header({
 			"allowed": d.allowed,
@@ -97,6 +102,21 @@ bucket_access_logging_allowed(h) {
 #     "enabled": false,
 #   }
 #   ```
-bucket_access_logging_payload(edata) = x {
+bucket_access_logging_payload(edata) := x {
+	bucket_access_logging_payload_assert(edata, "<the argument to bucket_access_logging_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+bucket_access_logging_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [bucket_access_logging_payload_assert_enabled(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+bucket_access_logging_payload_assert_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.bigquery
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure BigQuery dataset accessibility is restricted to a minimum level
 # You can emit this decision as follows:
@@ -22,8 +26,8 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.bigquery.dataset_accessibility_payload({
-#       "all_authenticated_users_roles": ["example"],
-#       "all_users_roles": ["example"],
+#       "all_authenticated_users_roles": [{"id": "example"}],
+#       "all_users_roles": [{"id": "example"}],
 #     }),
 #   })
 # }
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_bigquery_dataset_accessibility".
 dataset_accessibility(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": dataset_accessibility_header({
 			"allowed": d.allowed,
@@ -89,16 +94,83 @@ dataset_accessibility_allowed(h) {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_bigquery_dataset_accessibility
 #
 #   The parameter `data` is an object with the following fields: 
-#   - all_authenticated_users_roles: string
-#   - all_users_roles: string
+#   - all_authenticated_users_roles: {"id": string}
+#   - all_users_roles: {"id": string}
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "all_authenticated_users_roles": ["example"],
-#     "all_users_roles": ["example"],
+#     "all_authenticated_users_roles": [{"id": "example"}],
+#     "all_users_roles": [{"id": "example"}],
 #   }
 #   ```
-dataset_accessibility_payload(edata) = x {
+dataset_accessibility_payload(edata) := x {
+	dataset_accessibility_payload_assert(edata, "<the argument to dataset_accessibility_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+dataset_accessibility_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "all_authenticated_users_roles", concat("", [hint, ".", "all_authenticated_users_roles"])),
+		assertion.has_key(edata, "all_users_roles", concat("", [hint, ".", "all_users_roles"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		dataset_accessibility_payload_assert_all_authenticated_users_roles(edata, "all_authenticated_users_roles", concat("", [hint, ".", "all_authenticated_users_roles"])),
+		dataset_accessibility_payload_assert_all_users_roles(edata, "all_users_roles", concat("", [hint, ".", "all_users_roles"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+dataset_accessibility_payload_assert_all_authenticated_users_roles(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [dataset_accessibility_payload_assert_all_authenticated_users_roles_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+dataset_accessibility_payload_assert_all_authenticated_users_roles_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [assertion.has_typed_key(x[key], "id", "string", hint)]
+	every c in key_checks { c }
+	value_checks := [dataset_accessibility_payload_assert_all_authenticated_users_roles_element_id(x[key], "id", concat("", [hint, ".", "id"]))]
+	every c in value_checks { c }
+} else := false
+
+dataset_accessibility_payload_assert_all_authenticated_users_roles_element_id(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+dataset_accessibility_payload_assert_all_users_roles(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [dataset_accessibility_payload_assert_all_users_roles_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+dataset_accessibility_payload_assert_all_users_roles_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [assertion.has_typed_key(x[key], "id", "string", hint)]
+	every c in key_checks { c }
+	value_checks := [dataset_accessibility_payload_assert_all_users_roles_element_id(x[key], "id", concat("", [hint, ".", "id"]))]
+	every c in value_checks { c }
+} else := false
+
+dataset_accessibility_payload_assert_all_users_roles_element_id(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

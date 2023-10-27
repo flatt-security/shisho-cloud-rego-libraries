@@ -4,6 +4,10 @@
 package shisho.decision.dependency
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Update packages with known vulnerabilities
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:package_known_vulnerability".
 package_known_vulnerability(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": package_known_vulnerability_header({
 			"allowed": d.allowed,
@@ -95,6 +100,101 @@ package_known_vulnerability_allowed(h) {
 #     "vulnerabilities": [{"name": "example", "version": "example", "vuln_constraint": "example", "vuln_id": "example", "vuln_namespace": "example", "advisories": ["example"], "description": "example", "found_at": "example"}],
 #   }
 #   ```
-package_known_vulnerability_payload(edata) = x {
+package_known_vulnerability_payload(edata) := x {
+	package_known_vulnerability_payload_assert(edata, "<the argument to package_known_vulnerability_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+package_known_vulnerability_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "vulnerabilities", concat("", [hint, ".", "vulnerabilities"]))]
+	every c in key_checks { c }
+
+	value_checks := [package_known_vulnerability_payload_assert_vulnerabilities(edata, "vulnerabilities", concat("", [hint, ".", "vulnerabilities"]))]
+	every c in value_checks { c }
+} else := false
+
+package_known_vulnerability_payload_assert_vulnerabilities(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [package_known_vulnerability_payload_assert_vulnerabilities_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+package_known_vulnerability_payload_assert_vulnerabilities_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "name", "string", hint),
+		assertion.has_typed_key(x[key], "version", "string", hint),
+		assertion.has_typed_key(x[key], "vuln_constraint", "string", hint),
+		assertion.has_typed_key(x[key], "vuln_id", "string", hint),
+		assertion.has_typed_key(x[key], "vuln_namespace", "string", hint),
+		assertion.has_typed_key(x[key], "advisories", "array", hint),
+		assertion.has_typed_key(x[key], "description", "string", hint),
+		assertion.has_typed_key(x[key], "found_at", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		package_known_vulnerability_payload_assert_vulnerabilities_element_name(x[key], "name", concat("", [hint, ".", "name"])),
+		package_known_vulnerability_payload_assert_vulnerabilities_element_version(x[key], "version", concat("", [hint, ".", "version"])),
+		package_known_vulnerability_payload_assert_vulnerabilities_element_vuln_constraint(x[key], "vuln_constraint", concat("", [hint, ".", "vuln_constraint"])),
+		package_known_vulnerability_payload_assert_vulnerabilities_element_vuln_id(x[key], "vuln_id", concat("", [hint, ".", "vuln_id"])),
+		package_known_vulnerability_payload_assert_vulnerabilities_element_vuln_namespace(x[key], "vuln_namespace", concat("", [hint, ".", "vuln_namespace"])),
+		package_known_vulnerability_payload_assert_vulnerabilities_element_advisories(x[key], "advisories", concat("", [hint, ".", "advisories"])),
+		package_known_vulnerability_payload_assert_vulnerabilities_element_description(x[key], "description", concat("", [hint, ".", "description"])),
+		package_known_vulnerability_payload_assert_vulnerabilities_element_found_at(x[key], "found_at", concat("", [hint, ".", "found_at"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+package_known_vulnerability_payload_assert_vulnerabilities_element_advisories(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [package_known_vulnerability_payload_assert_vulnerabilities_element_advisories_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+package_known_vulnerability_payload_assert_vulnerabilities_element_advisories_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+package_known_vulnerability_payload_assert_vulnerabilities_element_description(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+package_known_vulnerability_payload_assert_vulnerabilities_element_found_at(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+package_known_vulnerability_payload_assert_vulnerabilities_element_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+package_known_vulnerability_payload_assert_vulnerabilities_element_version(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+package_known_vulnerability_payload_assert_vulnerabilities_element_vuln_constraint(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+package_known_vulnerability_payload_assert_vulnerabilities_element_vuln_id(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+package_known_vulnerability_payload_assert_vulnerabilities_element_vuln_namespace(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

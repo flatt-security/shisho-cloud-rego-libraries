@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure credentials unused for specific days are disabled
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_credentials_inventory".
 credentials_inventory(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": credentials_inventory_header({
 			"allowed": d.allowed,
@@ -100,6 +105,31 @@ credentials_inventory_allowed(h) {
 #     "recommended_grace_period_days": 0,
 #   }
 #   ```
-credentials_inventory_payload(edata) = x {
+credentials_inventory_payload(edata) := x {
+	credentials_inventory_payload_assert(edata, "<the argument to credentials_inventory_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+credentials_inventory_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "last_used_at", concat("", [hint, ".", "last_used_at"])),
+		assertion.has_key(edata, "recommended_grace_period_days", concat("", [hint, ".", "recommended_grace_period_days"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		credentials_inventory_payload_assert_last_used_at(edata, "last_used_at", concat("", [hint, ".", "last_used_at"])),
+		credentials_inventory_payload_assert_recommended_grace_period_days(edata, "recommended_grace_period_days", concat("", [hint, ".", "recommended_grace_period_days"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+credentials_inventory_payload_assert_last_used_at(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+credentials_inventory_payload_assert_recommended_grace_period_days(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false

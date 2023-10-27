@@ -4,6 +4,10 @@
 package shisho.decision.aws.kms
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure rotation for customer created symmetric CMKs is enabled
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_kms_symmetric_cmk_rotation".
 symmetric_cmk_rotation(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": symmetric_cmk_rotation_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ symmetric_cmk_rotation_allowed(h) {
 #     "enabled": false,
 #   }
 #   ```
-symmetric_cmk_rotation_payload(edata) = x {
+symmetric_cmk_rotation_payload(edata) := x {
+	symmetric_cmk_rotation_payload_assert(edata, "<the argument to symmetric_cmk_rotation_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+symmetric_cmk_rotation_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [symmetric_cmk_rotation_payload_assert_enabled(edata, "enabled", concat("", [hint, ".", "enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+symmetric_cmk_rotation_payload_assert_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

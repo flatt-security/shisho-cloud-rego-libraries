@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.sql
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that the skip_show_database database flag for Cloud SQL for MySQL instance is set to on
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_sql_instance_mysql_show_database".
 instance_mysql_show_database(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_mysql_show_database_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ instance_mysql_show_database_allowed(h) {
 #     "skip_show_database_state": "example",
 #   }
 #   ```
-instance_mysql_show_database_payload(edata) = x {
+instance_mysql_show_database_payload(edata) := x {
+	instance_mysql_show_database_payload_assert(edata, "<the argument to instance_mysql_show_database_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_mysql_show_database_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "skip_show_database_state", concat("", [hint, ".", "skip_show_database_state"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_mysql_show_database_payload_assert_skip_show_database_state(edata, "skip_show_database_state", concat("", [hint, ".", "skip_show_database_state"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_mysql_show_database_payload_assert_skip_show_database_state(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

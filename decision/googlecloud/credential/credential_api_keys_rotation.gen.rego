@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.credential
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure API keys are rotated within reasonable days
 # You can emit this decision as follows:
@@ -22,7 +26,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.credential.api_keys_rotation_payload({
-#       "created_at": ["example"],
+#       "created_at": "example",
 #     }),
 #   })
 # }
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_credential_api_keys_rotation".
 api_keys_rotation(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": api_keys_rotation_header({
 			"allowed": d.allowed,
@@ -93,9 +98,24 @@ api_keys_rotation_allowed(h) {
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "created_at": ["example"],
+#     "created_at": "example",
 #   }
 #   ```
-api_keys_rotation_payload(edata) = x {
+api_keys_rotation_payload(edata) := x {
+	api_keys_rotation_payload_assert(edata, "<the argument to api_keys_rotation_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+api_keys_rotation_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "created_at", concat("", [hint, ".", "created_at"]))]
+	every c in key_checks { c }
+
+	value_checks := [api_keys_rotation_payload_assert_created_at(edata, "created_at", concat("", [hint, ".", "created_at"]))]
+	every c in value_checks { c }
+} else := false
+
+api_keys_rotation_payload_assert_created_at(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

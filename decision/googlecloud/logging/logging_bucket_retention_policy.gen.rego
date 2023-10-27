@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.logging
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that Cloud Storage buckets for storing logs are configured using bucket lock
 # You can emit this decision as follows:
@@ -36,6 +40,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_logging_bucket_retention_policy".
 bucket_retention_policy(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": bucket_retention_policy_header({
 			"allowed": d.allowed,
@@ -102,6 +107,37 @@ bucket_retention_policy_allowed(h) {
 #     "storage_bucket_name": "example",
 #   }
 #   ```
-bucket_retention_policy_payload(edata) = x {
+bucket_retention_policy_payload(edata) := x {
+	bucket_retention_policy_payload_assert(edata, "<the argument to bucket_retention_policy_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+bucket_retention_policy_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "locked", concat("", [hint, ".", "locked"])),
+		assertion.has_key(edata, "retention_period", concat("", [hint, ".", "retention_period"])),
+		assertion.has_key(edata, "storage_bucket_name", concat("", [hint, ".", "storage_bucket_name"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		bucket_retention_policy_payload_assert_locked(edata, "locked", concat("", [hint, ".", "locked"])),
+		bucket_retention_policy_payload_assert_retention_period(edata, "retention_period", concat("", [hint, ".", "retention_period"])),
+		bucket_retention_policy_payload_assert_storage_bucket_name(edata, "storage_bucket_name", concat("", [hint, ".", "storage_bucket_name"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+bucket_retention_policy_payload_assert_locked(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+bucket_retention_policy_payload_assert_retention_period(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+bucket_retention_policy_payload_assert_storage_bucket_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

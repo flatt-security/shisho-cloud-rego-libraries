@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.compute
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure critical Compute Engine disks use Customer-Supplied Encryption Keys (CSEK)
 # You can emit this decision as follows:
@@ -22,7 +26,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.googlecloud.compute.disk_encryption_key_payload({
-#       "keys": {"target_disk": "example", "key_name": "example", "encryption_key_type": ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_UNKNOWN},
+#       "keys": [{"target_disk": "example", "key_name": "example", "key_type": ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_UNKNOWN}],
 #     }),
 #   })
 # }
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_compute_disk_encryption_key".
 disk_encryption_key(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": disk_encryption_key_header({
 			"allowed": d.allowed,
@@ -88,17 +93,69 @@ disk_encryption_key_allowed(h) {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_compute_disk_encryption_key
 #
 #   The parameter `data` is an object with the following fields: 
-#   - keys: {"target_disk": string, "key_name": string, "encryption_key_type": encryption_key_type}
+#   - keys: {"target_disk": string, "key_name": string, "key_type": encryption_key_type}
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "keys": {"target_disk": "example", "key_name": "example", "encryption_key_type": ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_UNKNOWN},
+#     "keys": [{"target_disk": "example", "key_name": "example", "key_type": ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_UNKNOWN}],
 #   }
 #   ```
-disk_encryption_key_payload(edata) = x {
+disk_encryption_key_payload(edata) := x {
+	disk_encryption_key_payload_assert(edata, "<the argument to disk_encryption_key_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+disk_encryption_key_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "keys", concat("", [hint, ".", "keys"]))]
+	every c in key_checks { c }
+
+	value_checks := [disk_encryption_key_payload_assert_keys(edata, "keys", concat("", [hint, ".", "keys"]))]
+	every c in value_checks { c }
+} else := false
+
+disk_encryption_key_payload_assert_keys(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [disk_encryption_key_payload_assert_keys_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+disk_encryption_key_payload_assert_keys_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "target_disk", "string", hint),
+		assertion.has_typed_key(x[key], "key_name", "string", hint),
+		assertion.has_typed_key(x[key], "key_type", "number", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		disk_encryption_key_payload_assert_keys_element_target_disk(x[key], "target_disk", concat("", [hint, ".", "target_disk"])),
+		disk_encryption_key_payload_assert_keys_element_key_name(x[key], "key_name", concat("", [hint, ".", "key_name"])),
+		disk_encryption_key_payload_assert_keys_element_key_type(x[key], "key_type", concat("", [hint, ".", "key_type"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+disk_encryption_key_payload_assert_keys_element_key_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+disk_encryption_key_payload_assert_keys_element_key_type(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+disk_encryption_key_payload_assert_keys_element_target_disk(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 ENCRYPTION_KEY_TYPE_ENCRYPTION_KEY_TYPE_UNKNOWN = 0
 

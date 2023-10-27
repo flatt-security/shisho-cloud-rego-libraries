@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.kms
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that Cloud KMS cryptokeys are exposed only to trusted principals
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_kms_key_accessibility".
 key_accessibility(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": key_accessibility_header({
 			"allowed": d.allowed,
@@ -96,6 +101,52 @@ key_accessibility_allowed(h) {
 #     "forbidden_bindings": [{"principal": "example", "role": "example"}],
 #   }
 #   ```
-key_accessibility_payload(edata) = x {
+key_accessibility_payload(edata) := x {
+	key_accessibility_payload_assert(edata, "<the argument to key_accessibility_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+key_accessibility_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "forbidden_bindings", concat("", [hint, ".", "forbidden_bindings"]))]
+	every c in key_checks { c }
+
+	value_checks := [key_accessibility_payload_assert_forbidden_bindings(edata, "forbidden_bindings", concat("", [hint, ".", "forbidden_bindings"]))]
+	every c in value_checks { c }
+} else := false
+
+key_accessibility_payload_assert_forbidden_bindings(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [key_accessibility_payload_assert_forbidden_bindings_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+key_accessibility_payload_assert_forbidden_bindings_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "principal", "string", hint),
+		assertion.has_typed_key(x[key], "role", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		key_accessibility_payload_assert_forbidden_bindings_element_principal(x[key], "principal", concat("", [hint, ".", "principal"])),
+		key_accessibility_payload_assert_forbidden_bindings_element_role(x[key], "role", concat("", [hint, ".", "role"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+key_accessibility_payload_assert_forbidden_bindings_element_principal(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+key_accessibility_payload_assert_forbidden_bindings_element_role(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

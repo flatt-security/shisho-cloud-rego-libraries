@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.networking
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure legacy networks do not exist for older Google Cloud projects
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_networking_legacy_network".
 legacy_network(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": legacy_network_header({
 			"allowed": d.allowed,
@@ -99,6 +104,31 @@ legacy_network_allowed(h) {
 #     "subnetwork_mode": "example",
 #   }
 #   ```
-legacy_network_payload(edata) = x {
+legacy_network_payload(edata) := x {
+	legacy_network_payload_assert(edata, "<the argument to legacy_network_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+legacy_network_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "name", concat("", [hint, ".", "name"])),
+		assertion.has_key(edata, "subnetwork_mode", concat("", [hint, ".", "subnetwork_mode"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		legacy_network_payload_assert_name(edata, "name", concat("", [hint, ".", "name"])),
+		legacy_network_payload_assert_subnetwork_mode(edata, "subnetwork_mode", concat("", [hint, ".", "subnetwork_mode"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+legacy_network_payload_assert_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+legacy_network_payload_assert_subnetwork_mode(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

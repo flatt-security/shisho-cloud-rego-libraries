@@ -4,6 +4,10 @@
 package shisho.decision.aws.alb
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Application Load Balancers drop invalid HTTP headers
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_alb_invalid_header_handling".
 invalid_header_handling(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": invalid_header_handling_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ invalid_header_handling_allowed(h) {
 #     "invalid_header_mitigation_enabled": false,
 #   }
 #   ```
-invalid_header_handling_payload(edata) = x {
+invalid_header_handling_payload(edata) := x {
+	invalid_header_handling_payload_assert(edata, "<the argument to invalid_header_handling_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+invalid_header_handling_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "invalid_header_mitigation_enabled", concat("", [hint, ".", "invalid_header_mitigation_enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [invalid_header_handling_payload_assert_invalid_header_mitigation_enabled(edata, "invalid_header_mitigation_enabled", concat("", [hint, ".", "invalid_header_mitigation_enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+invalid_header_handling_payload_assert_invalid_header_mitigation_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

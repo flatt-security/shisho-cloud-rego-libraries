@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that Google Cloud permissions are granted only to principals in trusted identity sources
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_iam_principal_source".
 principal_source(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": principal_source_header({
 			"allowed": d.allowed,
@@ -96,6 +101,34 @@ principal_source_allowed(h) {
 #     "source_domains": ["example"],
 #   }
 #   ```
-principal_source_payload(edata) = x {
+principal_source_payload(edata) := x {
+	principal_source_payload_assert(edata, "<the argument to principal_source_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+principal_source_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "source_domains", concat("", [hint, ".", "source_domains"]))]
+	every c in key_checks { c }
+
+	value_checks := [principal_source_payload_assert_source_domains(edata, "source_domains", concat("", [hint, ".", "source_domains"]))]
+	every c in value_checks { c }
+} else := false
+
+principal_source_payload_assert_source_domains(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [principal_source_payload_assert_source_domains_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+principal_source_payload_assert_source_domains_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

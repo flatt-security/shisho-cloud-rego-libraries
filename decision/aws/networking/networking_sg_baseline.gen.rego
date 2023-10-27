@@ -4,6 +4,10 @@
 package shisho.decision.aws.networking
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure the default security group restricts all traffic
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_networking_sg_baseline".
 sg_baseline(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": sg_baseline_header({
 			"allowed": d.allowed,
@@ -99,6 +104,105 @@ sg_baseline_allowed(h) {
 #     "ip_permissions_ingress": [{"ip_protocol": "example", "from_port": 0, "to_port": 0}],
 #   }
 #   ```
-sg_baseline_payload(edata) = x {
+sg_baseline_payload(edata) := x {
+	sg_baseline_payload_assert(edata, "<the argument to sg_baseline_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+sg_baseline_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "ip_permissions_egress", concat("", [hint, ".", "ip_permissions_egress"])),
+		assertion.has_key(edata, "ip_permissions_ingress", concat("", [hint, ".", "ip_permissions_ingress"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		sg_baseline_payload_assert_ip_permissions_egress(edata, "ip_permissions_egress", concat("", [hint, ".", "ip_permissions_egress"])),
+		sg_baseline_payload_assert_ip_permissions_ingress(edata, "ip_permissions_ingress", concat("", [hint, ".", "ip_permissions_ingress"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+sg_baseline_payload_assert_ip_permissions_egress(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [sg_baseline_payload_assert_ip_permissions_egress_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+sg_baseline_payload_assert_ip_permissions_egress_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "ip_protocol", "string", hint),
+		assertion.has_typed_key(x[key], "from_port", "number", hint),
+		assertion.has_typed_key(x[key], "to_port", "number", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		sg_baseline_payload_assert_ip_permissions_egress_element_ip_protocol(x[key], "ip_protocol", concat("", [hint, ".", "ip_protocol"])),
+		sg_baseline_payload_assert_ip_permissions_egress_element_from_port(x[key], "from_port", concat("", [hint, ".", "from_port"])),
+		sg_baseline_payload_assert_ip_permissions_egress_element_to_port(x[key], "to_port", concat("", [hint, ".", "to_port"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+sg_baseline_payload_assert_ip_permissions_egress_element_from_port(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+sg_baseline_payload_assert_ip_permissions_egress_element_ip_protocol(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+sg_baseline_payload_assert_ip_permissions_egress_element_to_port(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+sg_baseline_payload_assert_ip_permissions_ingress(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [sg_baseline_payload_assert_ip_permissions_ingress_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+sg_baseline_payload_assert_ip_permissions_ingress_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "ip_protocol", "string", hint),
+		assertion.has_typed_key(x[key], "from_port", "number", hint),
+		assertion.has_typed_key(x[key], "to_port", "number", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		sg_baseline_payload_assert_ip_permissions_ingress_element_ip_protocol(x[key], "ip_protocol", concat("", [hint, ".", "ip_protocol"])),
+		sg_baseline_payload_assert_ip_permissions_ingress_element_from_port(x[key], "from_port", concat("", [hint, ".", "from_port"])),
+		sg_baseline_payload_assert_ip_permissions_ingress_element_to_port(x[key], "to_port", concat("", [hint, ".", "to_port"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+sg_baseline_payload_assert_ip_permissions_ingress_element_from_port(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+sg_baseline_payload_assert_ip_permissions_ingress_element_ip_protocol(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+sg_baseline_payload_assert_ip_permissions_ingress_element_to_port(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false

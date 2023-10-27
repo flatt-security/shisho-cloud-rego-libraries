@@ -4,6 +4,10 @@
 package shisho.decision.aws.alb
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Application Load Balancers have an active logging bucket
 # You can emit this decision as follows:
@@ -36,6 +40,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_alb_logging".
 logging(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": logging_header({
 			"allowed": d.allowed,
@@ -102,6 +107,37 @@ logging_allowed(h) {
 #     "log_prefix": "example",
 #   }
 #   ```
-logging_payload(edata) = x {
+logging_payload(edata) := x {
+	logging_payload_assert(edata, "<the argument to logging_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+logging_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "log_bucket", concat("", [hint, ".", "log_bucket"])),
+		assertion.has_key(edata, "log_enabled", concat("", [hint, ".", "log_enabled"])),
+		assertion.has_key(edata, "log_prefix", concat("", [hint, ".", "log_prefix"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		logging_payload_assert_log_bucket(edata, "log_bucket", concat("", [hint, ".", "log_bucket"])),
+		logging_payload_assert_log_enabled(edata, "log_enabled", concat("", [hint, ".", "log_enabled"])),
+		logging_payload_assert_log_prefix(edata, "log_prefix", concat("", [hint, ".", "log_prefix"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+logging_payload_assert_log_bucket(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+logging_payload_assert_log_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+logging_payload_assert_log_prefix(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

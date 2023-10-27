@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that IAM Access analyzer is enabled for all regions
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_access_analyzers".
 access_analyzers(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": access_analyzers_header({
 			"allowed": d.allowed,
@@ -99,6 +104,75 @@ access_analyzers_allowed(h) {
 #     "missing_regions": ["example"],
 #   }
 #   ```
-access_analyzers_payload(edata) = x {
+access_analyzers_payload(edata) := x {
+	access_analyzers_payload_assert(edata, "<the argument to access_analyzers_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+access_analyzers_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "analyzers", concat("", [hint, ".", "analyzers"])),
+		assertion.has_key(edata, "missing_regions", concat("", [hint, ".", "missing_regions"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		access_analyzers_payload_assert_analyzers(edata, "analyzers", concat("", [hint, ".", "analyzers"])),
+		access_analyzers_payload_assert_missing_regions(edata, "missing_regions", concat("", [hint, ".", "missing_regions"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+access_analyzers_payload_assert_analyzers(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [access_analyzers_payload_assert_analyzers_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+access_analyzers_payload_assert_analyzers_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "region", "string", hint),
+		assertion.has_typed_key(x[key], "analyzer_name", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		access_analyzers_payload_assert_analyzers_element_region(x[key], "region", concat("", [hint, ".", "region"])),
+		access_analyzers_payload_assert_analyzers_element_analyzer_name(x[key], "analyzer_name", concat("", [hint, ".", "analyzer_name"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+access_analyzers_payload_assert_analyzers_element_analyzer_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+access_analyzers_payload_assert_analyzers_element_region(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+access_analyzers_payload_assert_missing_regions(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [access_analyzers_payload_assert_missing_regions_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+access_analyzers_payload_assert_missing_regions_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

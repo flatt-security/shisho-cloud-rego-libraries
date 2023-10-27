@@ -4,6 +4,10 @@
 package shisho.decision.aws.s3
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure all S3 buckets are encrypted
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_s3_bucket_encryption".
 bucket_encryption(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": bucket_encryption_header({
 			"allowed": d.allowed,
@@ -97,6 +102,34 @@ bucket_encryption_allowed(h) {
 #     "algorithms": ["example"],
 #   }
 #   ```
-bucket_encryption_payload(edata) = x {
+bucket_encryption_payload(edata) := x {
+	bucket_encryption_payload_assert(edata, "<the argument to bucket_encryption_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+bucket_encryption_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "algorithms", concat("", [hint, ".", "algorithms"]))]
+	every c in key_checks { c }
+
+	value_checks := [bucket_encryption_payload_assert_algorithms(edata, "algorithms", concat("", [hint, ".", "algorithms"]))]
+	every c in value_checks { c }
+} else := false
+
+bucket_encryption_payload_assert_algorithms(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [bucket_encryption_payload_assert_algorithms_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+bucket_encryption_payload_assert_algorithms_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

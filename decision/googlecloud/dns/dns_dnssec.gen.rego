@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.dns
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure DNSSEC is enabled for Cloud DNS zones
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_dns_dnssec".
 dnssec(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": dnssec_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ dnssec_allowed(h) {
 #     "dnssec_enabled": false,
 #   }
 #   ```
-dnssec_payload(edata) = x {
+dnssec_payload(edata) := x {
+	dnssec_payload_assert(edata, "<the argument to dnssec_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+dnssec_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "dnssec_enabled", concat("", [hint, ".", "dnssec_enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [dnssec_payload_assert_dnssec_enabled(edata, "dnssec_enabled", concat("", [hint, ".", "dnssec_enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+dnssec_payload_assert_dnssec_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

@@ -4,6 +4,10 @@
 package shisho.decision.aws.networking
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure no network ACLs allow ingress from 0.0.0.0/0 to remote server administration ports
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_networking_acl_ingress".
 acl_ingress(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": acl_ingress_header({
 			"allowed": d.allowed,
@@ -97,6 +102,42 @@ acl_ingress_allowed(h) {
 #     "insecure_acls": [{"id": "example"}],
 #   }
 #   ```
-acl_ingress_payload(edata) = x {
+acl_ingress_payload(edata) := x {
+	acl_ingress_payload_assert(edata, "<the argument to acl_ingress_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+acl_ingress_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "insecure_acls", concat("", [hint, ".", "insecure_acls"]))]
+	every c in key_checks { c }
+
+	value_checks := [acl_ingress_payload_assert_insecure_acls(edata, "insecure_acls", concat("", [hint, ".", "insecure_acls"]))]
+	every c in value_checks { c }
+} else := false
+
+acl_ingress_payload_assert_insecure_acls(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [acl_ingress_payload_assert_insecure_acls_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+acl_ingress_payload_assert_insecure_acls_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [assertion.has_typed_key(x[key], "id", "string", hint)]
+	every c in key_checks { c }
+	value_checks := [acl_ingress_payload_assert_insecure_acls_element_id(x[key], "id", concat("", [hint, ".", "id"]))]
+	every c in value_checks { c }
+} else := false
+
+acl_ingress_payload_assert_insecure_acls_element_id(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

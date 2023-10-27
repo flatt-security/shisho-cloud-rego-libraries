@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.logging
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Cloud Audit Logging is configured to record API operations
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_logging_api_audit".
 api_audit(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": api_audit_header({
 			"allowed": d.allowed,
@@ -96,9 +101,99 @@ api_audit_allowed(h) {
 #     "audit_configs": [{"service": "example", "audit_log_configs": [{"audit_log_config_log_type": AUDIT_LOG_CONFIG_LOG_TYPE_LOG_TYPE_UNSPECIFIED, "exempted_members": ["example"]}]}],
 #   }
 #   ```
-api_audit_payload(edata) = x {
+api_audit_payload(edata) := x {
+	api_audit_payload_assert(edata, "<the argument to api_audit_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+api_audit_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "audit_configs", concat("", [hint, ".", "audit_configs"]))]
+	every c in key_checks { c }
+
+	value_checks := [api_audit_payload_assert_audit_configs(edata, "audit_configs", concat("", [hint, ".", "audit_configs"]))]
+	every c in value_checks { c }
+} else := false
+
+api_audit_payload_assert_audit_configs(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [api_audit_payload_assert_audit_configs_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+api_audit_payload_assert_audit_configs_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "service", "string", hint),
+		assertion.has_typed_key(x[key], "audit_log_configs", "array", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		api_audit_payload_assert_audit_configs_element_service(x[key], "service", concat("", [hint, ".", "service"])),
+		api_audit_payload_assert_audit_configs_element_audit_log_configs(x[key], "audit_log_configs", concat("", [hint, ".", "audit_log_configs"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+api_audit_payload_assert_audit_configs_element_audit_log_configs(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [api_audit_payload_assert_audit_configs_element_audit_log_configs_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+api_audit_payload_assert_audit_configs_element_audit_log_configs_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "audit_log_config_log_type", "number", hint),
+		assertion.has_typed_key(x[key], "exempted_members", "array", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		api_audit_payload_assert_audit_configs_element_audit_log_configs_element_audit_log_config_log_type(x[key], "audit_log_config_log_type", concat("", [hint, ".", "audit_log_config_log_type"])),
+		api_audit_payload_assert_audit_configs_element_audit_log_configs_element_exempted_members(x[key], "exempted_members", concat("", [hint, ".", "exempted_members"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+api_audit_payload_assert_audit_configs_element_audit_log_configs_element_audit_log_config_log_type(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+api_audit_payload_assert_audit_configs_element_audit_log_configs_element_exempted_members(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [api_audit_payload_assert_audit_configs_element_audit_log_configs_element_exempted_members_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+api_audit_payload_assert_audit_configs_element_audit_log_configs_element_exempted_members_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+api_audit_payload_assert_audit_configs_element_service(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 AUDIT_LOG_CONFIG_LOG_TYPE_LOG_TYPE_UNSPECIFIED = 0
 

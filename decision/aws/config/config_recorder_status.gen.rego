@@ -4,6 +4,10 @@
 package shisho.decision.aws.config
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure AWS Config is enabled in all regions
 # You can emit this decision as follows:
@@ -23,7 +27,7 @@ import data.shisho
 #     "subject": subject,
 #     "payload": shisho.decision.aws.config.recorder_status_payload({
 #       "missing_regions": ["example"],
-#       "recorders": {"name": "example", "region": "example", "recording_group": {"all_supported": false, "resource_types": ["example"], "include_global_resource_types": false}},
+#       "recorders": [{"name": "example", "region": "example", "recording_group": {"all_supported": false, "resource_types": ["example"], "include_global_resource_types": false}}],
 #     }),
 #   })
 # }
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_config_recorder_status".
 recorder_status(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": recorder_status_header({
 			"allowed": d.allowed,
@@ -96,9 +101,121 @@ recorder_status_allowed(h) {
 #   ```rego
 #   {
 #     "missing_regions": ["example"],
-#     "recorders": {"name": "example", "region": "example", "recording_group": {"all_supported": false, "resource_types": ["example"], "include_global_resource_types": false}},
+#     "recorders": [{"name": "example", "region": "example", "recording_group": {"all_supported": false, "resource_types": ["example"], "include_global_resource_types": false}}],
 #   }
 #   ```
-recorder_status_payload(edata) = x {
+recorder_status_payload(edata) := x {
+	recorder_status_payload_assert(edata, "<the argument to recorder_status_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+recorder_status_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "missing_regions", concat("", [hint, ".", "missing_regions"])),
+		assertion.has_key(edata, "recorders", concat("", [hint, ".", "recorders"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		recorder_status_payload_assert_missing_regions(edata, "missing_regions", concat("", [hint, ".", "missing_regions"])),
+		recorder_status_payload_assert_recorders(edata, "recorders", concat("", [hint, ".", "recorders"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+recorder_status_payload_assert_missing_regions(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [recorder_status_payload_assert_missing_regions_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+recorder_status_payload_assert_missing_regions_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+recorder_status_payload_assert_recorders(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [recorder_status_payload_assert_recorders_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+recorder_status_payload_assert_recorders_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "name", "string", hint),
+		assertion.has_typed_key(x[key], "region", "string", hint),
+		assertion.has_typed_key(x[key], "recording_group", "object", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		recorder_status_payload_assert_recorders_element_name(x[key], "name", concat("", [hint, ".", "name"])),
+		recorder_status_payload_assert_recorders_element_region(x[key], "region", concat("", [hint, ".", "region"])),
+		recorder_status_payload_assert_recorders_element_recording_group(x[key], "recording_group", concat("", [hint, ".", "recording_group"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+recorder_status_payload_assert_recorders_element_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+recorder_status_payload_assert_recorders_element_recording_group(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "all_supported", "boolean", hint),
+		assertion.has_typed_key(x[key], "resource_types", "array", hint),
+		assertion.has_typed_key(x[key], "include_global_resource_types", "boolean", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		recorder_status_payload_assert_recorders_element_recording_group_all_supported(x[key], "all_supported", concat("", [hint, ".", "all_supported"])),
+		recorder_status_payload_assert_recorders_element_recording_group_resource_types(x[key], "resource_types", concat("", [hint, ".", "resource_types"])),
+		recorder_status_payload_assert_recorders_element_recording_group_include_global_resource_types(x[key], "include_global_resource_types", concat("", [hint, ".", "include_global_resource_types"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+recorder_status_payload_assert_recorders_element_recording_group_all_supported(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+recorder_status_payload_assert_recorders_element_recording_group_include_global_resource_types(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+recorder_status_payload_assert_recorders_element_recording_group_resource_types(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [recorder_status_payload_assert_recorders_element_recording_group_resource_types_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+recorder_status_payload_assert_recorders_element_recording_group_resource_types_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+recorder_status_payload_assert_recorders_element_region(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

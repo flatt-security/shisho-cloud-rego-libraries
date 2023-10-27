@@ -4,6 +4,10 @@
 package shisho.decision.aws.cloudtrail
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure CloudTrail logs are encrypted at rest using KMS CMKs
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_cloudtrail_cmk_encryption".
 cmk_encryption(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": cmk_encryption_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ cmk_encryption_allowed(h) {
 #     "kms_key_id": "example",
 #   }
 #   ```
-cmk_encryption_payload(edata) = x {
+cmk_encryption_payload(edata) := x {
+	cmk_encryption_payload_assert(edata, "<the argument to cmk_encryption_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+cmk_encryption_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "kms_key_id", concat("", [hint, ".", "kms_key_id"]))]
+	every c in key_checks { c }
+
+	value_checks := [cmk_encryption_payload_assert_kms_key_id(edata, "kms_key_id", concat("", [hint, ".", "kms_key_id"]))]
+	every c in value_checks { c }
+} else := false
+
+cmk_encryption_payload_assert_kms_key_id(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

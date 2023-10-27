@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.compute
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure OS Login is enabled for a project
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_compute_instance_oslogin".
 instance_oslogin(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_oslogin_header({
 			"allowed": d.allowed,
@@ -96,6 +101,21 @@ instance_oslogin_allowed(h) {
 #     "oslogin_enabled": false,
 #   }
 #   ```
-instance_oslogin_payload(edata) = x {
+instance_oslogin_payload(edata) := x {
+	instance_oslogin_payload_assert(edata, "<the argument to instance_oslogin_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_oslogin_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "oslogin_enabled", concat("", [hint, ".", "oslogin_enabled"]))]
+	every c in key_checks { c }
+
+	value_checks := [instance_oslogin_payload_assert_oslogin_enabled(edata, "oslogin_enabled", concat("", [hint, ".", "oslogin_enabled"]))]
+	every c in value_checks { c }
+} else := false
+
+instance_oslogin_payload_assert_oslogin_enabled(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

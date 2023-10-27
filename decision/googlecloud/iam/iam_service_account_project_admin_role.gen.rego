@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure Google Cloud service accounts have admin privileges only when truly required
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_project_admin_role".
 service_account_project_admin_role(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": service_account_project_admin_role_header({
 			"allowed": d.allowed,
@@ -96,6 +101,52 @@ service_account_project_admin_role_allowed(h) {
 #     "suspicious_bindings": [{"service_account_email": "example", "role": "example"}],
 #   }
 #   ```
-service_account_project_admin_role_payload(edata) = x {
+service_account_project_admin_role_payload(edata) := x {
+	service_account_project_admin_role_payload_assert(edata, "<the argument to service_account_project_admin_role_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+service_account_project_admin_role_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "suspicious_bindings", concat("", [hint, ".", "suspicious_bindings"]))]
+	every c in key_checks { c }
+
+	value_checks := [service_account_project_admin_role_payload_assert_suspicious_bindings(edata, "suspicious_bindings", concat("", [hint, ".", "suspicious_bindings"]))]
+	every c in value_checks { c }
+} else := false
+
+service_account_project_admin_role_payload_assert_suspicious_bindings(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [service_account_project_admin_role_payload_assert_suspicious_bindings_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+service_account_project_admin_role_payload_assert_suspicious_bindings_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "service_account_email", "string", hint),
+		assertion.has_typed_key(x[key], "role", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		service_account_project_admin_role_payload_assert_suspicious_bindings_element_service_account_email(x[key], "service_account_email", concat("", [hint, ".", "service_account_email"])),
+		service_account_project_admin_role_payload_assert_suspicious_bindings_element_role(x[key], "role", concat("", [hint, ".", "role"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+service_account_project_admin_role_payload_assert_suspicious_bindings_element_role(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+service_account_project_admin_role_payload_assert_suspicious_bindings_element_service_account_email(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

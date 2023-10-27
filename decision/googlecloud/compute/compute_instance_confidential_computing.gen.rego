@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.compute
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that Confidential VM for Compute Engine instances is enabled
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_compute_instance_confidential_computing".
 instance_confidential_computing(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_confidential_computing_header({
 			"allowed": d.allowed,
@@ -99,9 +104,34 @@ instance_confidential_computing_allowed(h) {
 #     "machine_type": "example",
 #   }
 #   ```
-instance_confidential_computing_payload(edata) = x {
+instance_confidential_computing_payload(edata) := x {
+	instance_confidential_computing_payload_assert(edata, "<the argument to instance_confidential_computing_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_confidential_computing_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "confidential_computing_status", concat("", [hint, ".", "confidential_computing_status"])),
+		assertion.has_key(edata, "machine_type", concat("", [hint, ".", "machine_type"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		instance_confidential_computing_payload_assert_confidential_computing_status(edata, "confidential_computing_status", concat("", [hint, ".", "confidential_computing_status"])),
+		instance_confidential_computing_payload_assert_machine_type(edata, "machine_type", concat("", [hint, ".", "machine_type"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+instance_confidential_computing_payload_assert_confidential_computing_status(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+instance_confidential_computing_payload_assert_machine_type(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 CONFIDENTIAL_COMPUTING_STATUS_UNSUPPORTED = 0
 

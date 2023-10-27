@@ -4,6 +4,10 @@
 package shisho.decision.github.actions
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure dependencies of GitHub Actions workflows are pinned to verified versions
 # You can emit this decision as follows:
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_actions_dependency_pinning".
 dependency_pinning(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": dependency_pinning_header({
 			"allowed": d.allowed,
@@ -95,9 +100,67 @@ dependency_pinning_allowed(h) {
 #     "unpinned_dependencies": [{"path": "./.github/workflows/test.yaml", "line": 1, "column": 1, "dependency": "example"}],
 #   }
 #   ```
-dependency_pinning_payload(edata) = x {
+dependency_pinning_payload(edata) := x {
+	dependency_pinning_payload_assert(edata, "<the argument to dependency_pinning_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+dependency_pinning_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "unpinned_dependencies", concat("", [hint, ".", "unpinned_dependencies"]))]
+	every c in key_checks { c }
+
+	value_checks := [dependency_pinning_payload_assert_unpinned_dependencies(edata, "unpinned_dependencies", concat("", [hint, ".", "unpinned_dependencies"]))]
+	every c in value_checks { c }
+} else := false
+
+dependency_pinning_payload_assert_unpinned_dependencies(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [dependency_pinning_payload_assert_unpinned_dependencies_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+dependency_pinning_payload_assert_unpinned_dependencies_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "path", "string", hint),
+		assertion.has_typed_key(x[key], "line", "number", hint),
+		assertion.has_typed_key(x[key], "column", "number", hint),
+		assertion.has_typed_key(x[key], "dependency", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		dependency_pinning_payload_assert_unpinned_dependencies_element_path(x[key], "path", concat("", [hint, ".", "path"])),
+		dependency_pinning_payload_assert_unpinned_dependencies_element_line(x[key], "line", concat("", [hint, ".", "line"])),
+		dependency_pinning_payload_assert_unpinned_dependencies_element_column(x[key], "column", concat("", [hint, ".", "column"])),
+		dependency_pinning_payload_assert_unpinned_dependencies_element_dependency(x[key], "dependency", concat("", [hint, ".", "dependency"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+dependency_pinning_payload_assert_unpinned_dependencies_element_column(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+dependency_pinning_payload_assert_unpinned_dependencies_element_dependency(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+dependency_pinning_payload_assert_unpinned_dependencies_element_line(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+dependency_pinning_payload_assert_unpinned_dependencies_element_path(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure script evaluation by GitHub Actions workflows is validated
 # You can emit this decision as follows:
@@ -128,6 +191,7 @@ dependency_pinning_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_actions_insecure_script_evaluation".
 insecure_script_evaluation(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": insecure_script_evaluation_header({
 			"allowed": d.allowed,
@@ -189,9 +253,67 @@ insecure_script_evaluation_allowed(h) {
 #     "evaluated_scripts": [{"path": "./.github/workflows/test.yaml", "source_command": curl -s http://example.com, "line": 1, "column": 1}],
 #   }
 #   ```
-insecure_script_evaluation_payload(edata) = x {
+insecure_script_evaluation_payload(edata) := x {
+	insecure_script_evaluation_payload_assert(edata, "<the argument to insecure_script_evaluation_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+insecure_script_evaluation_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "evaluated_scripts", concat("", [hint, ".", "evaluated_scripts"]))]
+	every c in key_checks { c }
+
+	value_checks := [insecure_script_evaluation_payload_assert_evaluated_scripts(edata, "evaluated_scripts", concat("", [hint, ".", "evaluated_scripts"]))]
+	every c in value_checks { c }
+} else := false
+
+insecure_script_evaluation_payload_assert_evaluated_scripts(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [insecure_script_evaluation_payload_assert_evaluated_scripts_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+insecure_script_evaluation_payload_assert_evaluated_scripts_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "path", "string", hint),
+		assertion.has_typed_key(x[key], "source_command", "string", hint),
+		assertion.has_typed_key(x[key], "line", "number", hint),
+		assertion.has_typed_key(x[key], "column", "number", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		insecure_script_evaluation_payload_assert_evaluated_scripts_element_path(x[key], "path", concat("", [hint, ".", "path"])),
+		insecure_script_evaluation_payload_assert_evaluated_scripts_element_source_command(x[key], "source_command", concat("", [hint, ".", "source_command"])),
+		insecure_script_evaluation_payload_assert_evaluated_scripts_element_line(x[key], "line", concat("", [hint, ".", "line"])),
+		insecure_script_evaluation_payload_assert_evaluated_scripts_element_column(x[key], "column", concat("", [hint, ".", "column"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+insecure_script_evaluation_payload_assert_evaluated_scripts_element_column(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+insecure_script_evaluation_payload_assert_evaluated_scripts_element_line(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+insecure_script_evaluation_payload_assert_evaluated_scripts_element_path(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+insecure_script_evaluation_payload_assert_evaluated_scripts_element_source_command(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure explicit permissions for GitHub Actions workflows follow organization policies
 # You can emit this decision as follows:
@@ -222,6 +344,7 @@ insecure_script_evaluation_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_actions_workflow_explicit_permissions".
 workflow_explicit_permissions(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": workflow_explicit_permissions_header({
 			"allowed": d.allowed,
@@ -283,9 +406,68 @@ workflow_explicit_permissions_allowed(h) {
 #     "workflows_with_excessive_permissions": [{"path": "./.github/workflows/test.yaml", "excessive_permissions": ["example"]}],
 #   }
 #   ```
-workflow_explicit_permissions_payload(edata) = x {
+workflow_explicit_permissions_payload(edata) := x {
+	workflow_explicit_permissions_payload_assert(edata, "<the argument to workflow_explicit_permissions_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+workflow_explicit_permissions_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "workflows_with_excessive_permissions", concat("", [hint, ".", "workflows_with_excessive_permissions"]))]
+	every c in key_checks { c }
+
+	value_checks := [workflow_explicit_permissions_payload_assert_workflows_with_excessive_permissions(edata, "workflows_with_excessive_permissions", concat("", [hint, ".", "workflows_with_excessive_permissions"]))]
+	every c in value_checks { c }
+} else := false
+
+workflow_explicit_permissions_payload_assert_workflows_with_excessive_permissions(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [workflow_explicit_permissions_payload_assert_workflows_with_excessive_permissions_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+workflow_explicit_permissions_payload_assert_workflows_with_excessive_permissions_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "path", "string", hint),
+		assertion.has_typed_key(x[key], "excessive_permissions", "array", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		workflow_explicit_permissions_payload_assert_workflows_with_excessive_permissions_element_path(x[key], "path", concat("", [hint, ".", "path"])),
+		workflow_explicit_permissions_payload_assert_workflows_with_excessive_permissions_element_excessive_permissions(x[key], "excessive_permissions", concat("", [hint, ".", "excessive_permissions"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+workflow_explicit_permissions_payload_assert_workflows_with_excessive_permissions_element_excessive_permissions(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [workflow_explicit_permissions_payload_assert_workflows_with_excessive_permissions_element_excessive_permissions_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+workflow_explicit_permissions_payload_assert_workflows_with_excessive_permissions_element_excessive_permissions_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+workflow_explicit_permissions_payload_assert_workflows_with_excessive_permissions_element_path(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure GitHub Actions workflows do not permit any script injections
 # You can emit this decision as follows:
@@ -316,6 +498,7 @@ workflow_explicit_permissions_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_actions_workflow_script_injection_possibility".
 workflow_script_injection_possibility(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": workflow_script_injection_possibility_header({
 			"allowed": d.allowed,
@@ -377,9 +560,80 @@ workflow_script_injection_possibility_allowed(h) {
 #     "injectable_sinks": [{"path": "./.github/workflows/test.yaml", "line": 1, "column": 1, "abusable_fields": ["example"]}],
 #   }
 #   ```
-workflow_script_injection_possibility_payload(edata) = x {
+workflow_script_injection_possibility_payload(edata) := x {
+	workflow_script_injection_possibility_payload_assert(edata, "<the argument to workflow_script_injection_possibility_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+workflow_script_injection_possibility_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "injectable_sinks", concat("", [hint, ".", "injectable_sinks"]))]
+	every c in key_checks { c }
+
+	value_checks := [workflow_script_injection_possibility_payload_assert_injectable_sinks(edata, "injectable_sinks", concat("", [hint, ".", "injectable_sinks"]))]
+	every c in value_checks { c }
+} else := false
+
+workflow_script_injection_possibility_payload_assert_injectable_sinks(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [workflow_script_injection_possibility_payload_assert_injectable_sinks_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+workflow_script_injection_possibility_payload_assert_injectable_sinks_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "path", "string", hint),
+		assertion.has_typed_key(x[key], "line", "number", hint),
+		assertion.has_typed_key(x[key], "column", "number", hint),
+		assertion.has_typed_key(x[key], "abusable_fields", "array", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		workflow_script_injection_possibility_payload_assert_injectable_sinks_element_path(x[key], "path", concat("", [hint, ".", "path"])),
+		workflow_script_injection_possibility_payload_assert_injectable_sinks_element_line(x[key], "line", concat("", [hint, ".", "line"])),
+		workflow_script_injection_possibility_payload_assert_injectable_sinks_element_column(x[key], "column", concat("", [hint, ".", "column"])),
+		workflow_script_injection_possibility_payload_assert_injectable_sinks_element_abusable_fields(x[key], "abusable_fields", concat("", [hint, ".", "abusable_fields"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+workflow_script_injection_possibility_payload_assert_injectable_sinks_element_abusable_fields(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [workflow_script_injection_possibility_payload_assert_injectable_sinks_element_abusable_fields_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+workflow_script_injection_possibility_payload_assert_injectable_sinks_element_abusable_fields_element(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+workflow_script_injection_possibility_payload_assert_injectable_sinks_element_column(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+workflow_script_injection_possibility_payload_assert_injectable_sinks_element_line(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+workflow_script_injection_possibility_payload_assert_injectable_sinks_element_path(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
 
 # @title Ensure secrets do not appear in GitHub Actions Workflows directly
 # You can emit this decision as follows:
@@ -410,6 +664,7 @@ workflow_script_injection_possibility_payload(edata) = x {
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:github_actions_workflow_secret_handling".
 workflow_secret_handling(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": workflow_secret_handling_header({
 			"allowed": d.allowed,
@@ -471,6 +726,64 @@ workflow_secret_handling_allowed(h) {
 #     "hardcoded_secrets": [{"path": "./.github/workflows/test.yaml", "line": 1, "column": 1, "location_hint": "example"}],
 #   }
 #   ```
-workflow_secret_handling_payload(edata) = x {
+workflow_secret_handling_payload(edata) := x {
+	workflow_secret_handling_payload_assert(edata, "<the argument to workflow_secret_handling_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+workflow_secret_handling_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "hardcoded_secrets", concat("", [hint, ".", "hardcoded_secrets"]))]
+	every c in key_checks { c }
+
+	value_checks := [workflow_secret_handling_payload_assert_hardcoded_secrets(edata, "hardcoded_secrets", concat("", [hint, ".", "hardcoded_secrets"]))]
+	every c in value_checks { c }
+} else := false
+
+workflow_secret_handling_payload_assert_hardcoded_secrets(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [workflow_secret_handling_payload_assert_hardcoded_secrets_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+workflow_secret_handling_payload_assert_hardcoded_secrets_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "path", "string", hint),
+		assertion.has_typed_key(x[key], "line", "number", hint),
+		assertion.has_typed_key(x[key], "column", "number", hint),
+		assertion.has_typed_key(x[key], "location_hint", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		workflow_secret_handling_payload_assert_hardcoded_secrets_element_path(x[key], "path", concat("", [hint, ".", "path"])),
+		workflow_secret_handling_payload_assert_hardcoded_secrets_element_line(x[key], "line", concat("", [hint, ".", "line"])),
+		workflow_secret_handling_payload_assert_hardcoded_secrets_element_column(x[key], "column", concat("", [hint, ".", "column"])),
+		workflow_secret_handling_payload_assert_hardcoded_secrets_element_location_hint(x[key], "location_hint", concat("", [hint, ".", "location_hint"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+workflow_secret_handling_payload_assert_hardcoded_secrets_element_column(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+workflow_secret_handling_payload_assert_hardcoded_secrets_element_line(x, key, hint) {
+	assertion.is_type(x[key], "number", hint)
+} else := false
+
+workflow_secret_handling_payload_assert_hardcoded_secrets_element_location_hint(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+workflow_secret_handling_payload_assert_hardcoded_secrets_element_path(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

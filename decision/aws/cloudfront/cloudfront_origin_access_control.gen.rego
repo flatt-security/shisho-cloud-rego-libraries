@@ -4,6 +4,10 @@
 package shisho.decision.aws.cloudfront
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure CloudFront distributions with S3 backends use origin access control enabled
 # You can emit this decision as follows:
@@ -22,7 +26,7 @@ import data.shisho
 #     "allowed": allowed,
 #     "subject": subject,
 #     "payload": shisho.decision.aws.cloudfront.origin_access_control_payload({
-#       "origins": [{"id": "example", "domain_id": "example", "origin_access_control_configured": "example", "origin_access_identity_configured": "example"}],
+#       "origins": [{"id": "example", "domain_name": "example", "origin_access_control_configured": "example", "origin_access_identity_configured": "example"}],
 #     }),
 #   })
 # }
@@ -34,6 +38,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_cloudfront_origin_access_control".
 origin_access_control(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": origin_access_control_header({
 			"allowed": d.allowed,
@@ -88,14 +93,72 @@ origin_access_control_allowed(h) {
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_cloudfront_origin_access_control
 #
 #   The parameter `data` is an object with the following fields: 
-#   - origins: {"id": string, "domain_id": string, "origin_access_control_configured": string, "origin_access_identity_configured": string}
+#   - origins: {"id": string, "domain_name": string, "origin_access_control_configured": string, "origin_access_identity_configured": string}
 #
 #   For instance, `data` can take the following value:
 #   ```rego
 #   {
-#     "origins": [{"id": "example", "domain_id": "example", "origin_access_control_configured": "example", "origin_access_identity_configured": "example"}],
+#     "origins": [{"id": "example", "domain_name": "example", "origin_access_control_configured": "example", "origin_access_identity_configured": "example"}],
 #   }
 #   ```
-origin_access_control_payload(edata) = x {
+origin_access_control_payload(edata) := x {
+	origin_access_control_payload_assert(edata, "<the argument to origin_access_control_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+origin_access_control_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [assertion.has_key(edata, "origins", concat("", [hint, ".", "origins"]))]
+	every c in key_checks { c }
+
+	value_checks := [origin_access_control_payload_assert_origins(edata, "origins", concat("", [hint, ".", "origins"]))]
+	every c in value_checks { c }
+} else := false
+
+origin_access_control_payload_assert_origins(x, key, hint) {
+	assertion.is_set_or_array(x[key], hint)
+	checks := [origin_access_control_payload_assert_origins_element(x[key], i, concat("", [
+		hint,
+		"[",
+		format_int(i, 10),
+		"]",
+	])) |
+		_ := x[key][i]
+	]
+	every c in checks { c }
+} else := false
+
+origin_access_control_payload_assert_origins_element(x, key, hint) {
+	assertion.is_type(x[key], "object", hint)
+	key_checks := [
+		assertion.has_typed_key(x[key], "id", "string", hint),
+		assertion.has_typed_key(x[key], "domain_name", "string", hint),
+		assertion.has_typed_key(x[key], "origin_access_control_configured", "string", hint),
+		assertion.has_typed_key(x[key], "origin_access_identity_configured", "string", hint),
+	]
+	every c in key_checks { c }
+	value_checks := [
+		origin_access_control_payload_assert_origins_element_id(x[key], "id", concat("", [hint, ".", "id"])),
+		origin_access_control_payload_assert_origins_element_domain_name(x[key], "domain_name", concat("", [hint, ".", "domain_name"])),
+		origin_access_control_payload_assert_origins_element_origin_access_control_configured(x[key], "origin_access_control_configured", concat("", [hint, ".", "origin_access_control_configured"])),
+		origin_access_control_payload_assert_origins_element_origin_access_identity_configured(x[key], "origin_access_identity_configured", concat("", [hint, ".", "origin_access_identity_configured"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+origin_access_control_payload_assert_origins_element_domain_name(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+origin_access_control_payload_assert_origins_element_id(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+origin_access_control_payload_assert_origins_element_origin_access_control_configured(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+origin_access_control_payload_assert_origins_element_origin_access_identity_configured(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false

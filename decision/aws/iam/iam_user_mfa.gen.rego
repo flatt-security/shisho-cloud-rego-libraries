@@ -4,6 +4,10 @@
 package shisho.decision.aws.iam
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure multi-factor authentication (MFA) is enabled for all IAM users that have a console password
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:aws_iam_user_mfa".
 user_mfa(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": user_mfa_header({
 			"allowed": d.allowed,
@@ -100,6 +105,31 @@ user_mfa_allowed(h) {
 #     "mfa_active": false,
 #   }
 #   ```
-user_mfa_payload(edata) = x {
+user_mfa_payload(edata) := x {
+	user_mfa_payload_assert(edata, "<the argument to user_mfa_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+user_mfa_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "has_console_password", concat("", [hint, ".", "has_console_password"])),
+		assertion.has_key(edata, "mfa_active", concat("", [hint, ".", "mfa_active"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		user_mfa_payload_assert_has_console_password(edata, "has_console_password", concat("", [hint, ".", "has_console_password"])),
+		user_mfa_payload_assert_mfa_active(edata, "mfa_active", concat("", [hint, ".", "mfa_active"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+user_mfa_payload_assert_has_console_password(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false
+
+user_mfa_payload_assert_mfa_active(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

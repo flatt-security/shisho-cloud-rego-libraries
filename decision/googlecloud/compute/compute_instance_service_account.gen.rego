@@ -4,6 +4,10 @@
 package shisho.decision.googlecloud.compute
 
 import data.shisho
+import data.shisho.assertion
+import data.shisho.primitive
+
+import future.keywords.every
 
 # @title Ensure that Compute Engine instances do not use default service accounts
 # You can emit this decision as follows:
@@ -35,6 +39,7 @@ import data.shisho
 # description: |
 #   Emits a decision whose type is decision.api.shisho.dev/v1beta:googlecloud_compute_instance_service_account".
 instance_service_account(d) = x {
+	shisho.decision.has_required_fields(d)
 	x := {
 		"header": instance_service_account_header({
 			"allowed": d.allowed,
@@ -98,6 +103,31 @@ instance_service_account_allowed(h) {
 #     "uses_default_account": false,
 #   }
 #   ```
-instance_service_account_payload(edata) = x {
+instance_service_account_payload(edata) := x {
+	instance_service_account_payload_assert(edata, "<the argument to instance_service_account_payload>")
 	x := json.marshal(edata)
-}
+} else := ""
+
+instance_service_account_payload_assert(edata, hint) {
+	assertion.is_type(edata, "object", hint)
+
+	key_checks := [
+		assertion.has_key(edata, "service_account_email", concat("", [hint, ".", "service_account_email"])),
+		assertion.has_key(edata, "uses_default_account", concat("", [hint, ".", "uses_default_account"])),
+	]
+	every c in key_checks { c }
+
+	value_checks := [
+		instance_service_account_payload_assert_service_account_email(edata, "service_account_email", concat("", [hint, ".", "service_account_email"])),
+		instance_service_account_payload_assert_uses_default_account(edata, "uses_default_account", concat("", [hint, ".", "uses_default_account"])),
+	]
+	every c in value_checks { c }
+} else := false
+
+instance_service_account_payload_assert_service_account_email(x, key, hint) {
+	assertion.is_type(x[key], "string", hint)
+} else := false
+
+instance_service_account_payload_assert_uses_default_account(x, key, hint) {
+	assertion.is_type(x[key], "boolean", hint)
+} else := false

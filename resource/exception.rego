@@ -11,6 +11,4 @@ is_excepted(resource_exceptions, resource_id) {
 } else {
 	filter := resource_exceptions[_]
 	filter == resource_id
-} else = false {
-	true
-}
+} else = false

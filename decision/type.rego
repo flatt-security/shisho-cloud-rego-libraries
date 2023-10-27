@@ -30,9 +30,7 @@ type_deny = 2
 #   You don't need to use this constant directly.
 as_decision_type(t) := type_allow {
 	t == true
-} else := type_deny {
-	true
-}
+} else := type_deny
 
 # METADATA
 # title: "Determines whether a decision allows input"
@@ -41,6 +39,4 @@ as_decision_type(t) := type_allow {
 #   Determines whether a decision allows input.
 is_allowed(d) {
 	d.header.type == type_allow
-} else = false {
-	true
-}
+} else = false

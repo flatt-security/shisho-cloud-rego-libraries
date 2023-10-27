@@ -52,6 +52,4 @@ severity_critical = 4
 #   Determines whether a decision allows input.
 has_severity(d, s) {
 	d.header.severity == s
-} else = false {
-	true
-}
+} else = false

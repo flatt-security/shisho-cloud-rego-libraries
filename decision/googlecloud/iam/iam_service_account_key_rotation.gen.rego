@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure user-managed/external keys for service accounts are rotated every 90 days or fewer
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -93,7 +93,7 @@ service_account_key_rotation_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_key_rotation
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - keys: {"name": string, "valid_after_at": string}
 #
 #   For instance, `data` can take the following value:

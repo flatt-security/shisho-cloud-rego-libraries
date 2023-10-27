@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure no security groups allow ingress from 0.0.0.0/0 to remote server administration ports
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"

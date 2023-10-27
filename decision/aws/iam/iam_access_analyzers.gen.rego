@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure that IAM Access analyzer is enabled for all regions
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -93,7 +93,7 @@ access_analyzers_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_iam_access_analyzers
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - analyzers: {"region": string, "analyzer_name": string}
 #   - missing_regions: string
 #

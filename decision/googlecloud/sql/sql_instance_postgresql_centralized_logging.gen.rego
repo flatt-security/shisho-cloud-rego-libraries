@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure that cloudsql.enable_pgaudit database flag for each Cloud SQL for PostgreSQL instance is set to on for centralized logging
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -92,7 +92,7 @@ instance_postgresql_centralized_logging_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_sql_instance_postgresql_centralized_logging
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - pgaudit_enabled: string
 #
 #   For instance, `data` can take the following value:

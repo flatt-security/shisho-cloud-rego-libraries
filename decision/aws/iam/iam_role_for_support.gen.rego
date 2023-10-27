@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure a support role has been created to manage incidents with AWS Support
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -93,7 +93,7 @@ role_for_support_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_iam_role_for_support
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - attached_roles: string
 #
 #   For instance, `data` can take the following value:

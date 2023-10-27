@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure AWS IAM access keys are rotated per pre-defined time window
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -94,7 +94,7 @@ key_rotation_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_iam_key_rotation
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - keys_requiring_rotation: {"id": string, "created_at": string}
 #   - recommended_rotation_window_days: number
 #

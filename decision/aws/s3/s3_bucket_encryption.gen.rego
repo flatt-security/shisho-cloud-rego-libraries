@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure all S3 buckets are encrypted
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -93,7 +93,7 @@ bucket_encryption_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_s3_bucket_encryption
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - algorithms: string
 #
 #   For instance, `data` can take the following value:

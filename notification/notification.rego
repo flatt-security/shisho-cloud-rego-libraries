@@ -5,12 +5,12 @@ package shisho.notification
 # scope: "rule"
 # description: |
 #   Emits a notification representing a notification group.
-# 
+#
 #   Example:
 #
 #   ```rego
 #   import data.shisho
-#  
+#
 #   notifications[n] {
 #   	n := shisho.notification.to_group(
 #         "NG12345678",
@@ -30,12 +30,12 @@ to_group(id, message) = x {
 # scope: "rule"
 # description: |
 #   Emits a notification representing a new email to the given email address
-# 
+#
 #   Example:
 #
 #   ```rego
 #   import data.shisho
-#  
+#
 #   notifications[n] {
 #   	n := shisho.notification.to_email(
 #         "hello@shisho.example",
@@ -55,12 +55,12 @@ to_email(email, message) = x {
 # scope: "rule"
 # description: |
 #   Emits a notification representing a new message on the given Slack channel
-# 
+#
 #   Example:
 #
 #   ```rego
 #   import data.shisho
-#  
+#
 #   notifications[n] {
 #   	n := shisho.notification.to_slack_channel(
 #         "WS123456",
@@ -93,12 +93,12 @@ to_slack_channel(workspace_id, channel_id, message) = x {
 # scope: "rule"
 # description: |
 #   Emits a notification representing a comment of the given GitHub issue
-# 
+#
 #   Example:
 #
 #   ```rego
 #   import data.shisho
-#  
+#
 #   notifications[n] {
 #   	n := shisho.notification.to_github_issue(
 #         "octcat",
@@ -122,12 +122,12 @@ to_github_issue(owner, repo, issue_id, message) = x {
 # scope: "rule"
 # description: |
 #   Emits a notification representing the given GitHub pull request
-# 
+#
 #   Example:
 #
 #   ```rego
 #   import data.shisho
-#  
+#
 #   notifications[n] {
 #   	n := shisho.notification.to_github_pull_request(
 #         "octcat",

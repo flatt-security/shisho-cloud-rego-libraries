@@ -25,7 +25,7 @@ type_deny = 2
 # scope: "rule"
 # description: |
 #   Converts the given boolean value to a decision type (type_allow or type_deny).
-# 
+#
 #   It's commonly used by `shisho.decision.*.*_header` functions.
 #   You don't need to use this constant directly.
 as_decision_type(t) := type_allow {

@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure Cloud Storage buckets are public only if intended
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -93,7 +93,7 @@ bucket_accessibility_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_storage_bucket_accessibility
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - public_acl_rules: {"role": string, "entity": string}
 #   - public_policy_bindings: {"role": string, "principal": string}
 #

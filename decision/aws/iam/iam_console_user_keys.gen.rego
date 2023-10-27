@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure access keys during initial user setup for all IAM users with a console password
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -95,7 +95,7 @@ console_user_keys_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_iam_console_user_keys
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - has_access_key: boolean
 #   - has_console_password: boolean
 #   - has_unused_access_key: boolean

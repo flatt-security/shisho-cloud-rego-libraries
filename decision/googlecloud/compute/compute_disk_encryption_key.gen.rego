@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure critical Compute Engine disks use Customer-Supplied Encryption Keys (CSEK)
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -92,7 +92,7 @@ disk_encryption_key_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_compute_disk_encryption_key
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - keys: {"target_disk": string, "key_name": string, "key_type": encryption_key_type}
 #
 #   For instance, `data` can take the following value:

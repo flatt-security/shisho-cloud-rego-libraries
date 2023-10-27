@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure AWS Config is enabled in all regions
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -93,7 +93,7 @@ recorder_status_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_config_recorder_status
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - missing_regions: string
 #   - recorders: {"name": string, "region": string, "recording_group": {"all_supported": boolean, "resource_types": string, "include_global_resource_types": boolean}}
 #

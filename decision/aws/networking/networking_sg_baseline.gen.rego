@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure the default security group restricts all traffic
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -93,7 +93,7 @@ sg_baseline_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_networking_sg_baseline
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - ip_permissions_egress: {"ip_protocol": string, "from_port": number, "to_port": number}
 #   - ip_permissions_ingress: {"ip_protocol": string, "from_port": number, "to_port": number}
 #

@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure the deletion of protected branches is limited
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -92,7 +92,7 @@ branch_deletion_policy_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_branch_deletion_policy
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - allowed: boolean
 #   - subject_branch: string
 #
@@ -134,10 +134,10 @@ branch_deletion_policy_payload_assert_subject_branch(x, key, hint) {
 
 # @title Ensure code owner’s review is required when a change affects owned code
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -215,7 +215,7 @@ code_owners_review_policy_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_code_owners_review_policy
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - required: boolean
 #   - subject_branch: string
 #
@@ -257,10 +257,10 @@ code_owners_review_policy_payload_assert_subject_branch(x, key, hint) {
 
 # @title Ensure verification of signed commits for new changes before merging
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -338,7 +338,7 @@ commit_signature_policy_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_commit_signature_policy
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - required: boolean
 #   - subject_branch: string
 #
@@ -380,10 +380,10 @@ commit_signature_policy_payload_assert_subject_branch(x, key, hint) {
 
 # @title Keep a default branch protected by branch protection rule(s)
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -460,7 +460,7 @@ default_branch_protection_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_default_branch_protection
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - default_branch_name: string
 #
 #   For instance, `data` can take the following value:
@@ -490,10 +490,10 @@ default_branch_protection_payload_assert_default_branch_name(x, key, hint) {
 
 # @title Ensure force push code to branches is denied
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -571,7 +571,7 @@ force_push_policy_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_force_push_policy
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - allowed: boolean
 #   - subject_branch: string
 #
@@ -613,10 +613,10 @@ force_push_policy_payload_assert_subject_branch(x, key, hint) {
 
 # @title Ensure linear history is required
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -694,7 +694,7 @@ linear_history_policy_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_linear_history_policy
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - required: boolean
 #   - subject_branch: string
 #
@@ -736,10 +736,10 @@ linear_history_policy_payload_assert_subject_branch(x, key, hint) {
 
 # @title Ensure any change to code receives the enough number of approvals by authenticated users
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -817,7 +817,7 @@ minimum_approval_number_policy_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_minimum_approval_number_policy
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - required_approval_count: number
 #   - subject_branch: string
 #
@@ -859,10 +859,10 @@ minimum_approval_number_policy_payload_assert_subject_branch(x, key, hint) {
 
 # @title Ensure branch protection rules are enforced for administrators
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -940,7 +940,7 @@ protection_enforcement_for_admins_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_protection_enforcement_for_admins
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - allowed: boolean
 #   - subject_branch: string
 #
@@ -982,10 +982,10 @@ protection_enforcement_for_admins_payload_assert_subject_branch(x, key, hint) {
 
 # @title Ensure minimum number of administrators are set for the GitHub repository
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -1062,7 +1062,7 @@ repo_admins_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_repo_admins
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - admins: string
 #
 #   For instance, `data` can take the following value:
@@ -1105,10 +1105,10 @@ repo_admins_payload_assert_admins_element(x, key, hint) {
 
 # @title Ensure deletion of GitHub repositories is restricted
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -1185,7 +1185,7 @@ repo_members_permission_on_deleting_repository_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_repo_members_permission_on_deleting_repository
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - allowed_users: string
 #
 #   For instance, `data` can take the following value:
@@ -1228,10 +1228,10 @@ repo_members_permission_on_deleting_repository_payload_assert_allowed_users_elem
 
 # @title Ensure previous approvals are dismissed when updates are introduced to a code change proposal
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -1309,7 +1309,7 @@ stale_review_policy_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_stale_review_policy
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - enforced: boolean
 #   - subject_branch: string
 #

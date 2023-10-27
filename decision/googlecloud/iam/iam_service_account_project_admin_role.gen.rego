@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure Google Cloud service accounts have admin privileges only when truly required
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -92,7 +92,7 @@ service_account_project_admin_role_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_iam_service_account_project_admin_role
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - suspicious_bindings: {"service_account_email": string, "role": string}
 #
 #   For instance, `data` can take the following value:

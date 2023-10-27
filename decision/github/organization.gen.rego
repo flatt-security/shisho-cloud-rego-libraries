@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Enforce two-factor authentication on GitHub organization(s)
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -91,7 +91,7 @@ org_2fa_status_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_org_2fa_status
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - enabled: boolean
 #
 #   For instance, `data` can take the following value:
@@ -121,10 +121,10 @@ org_2fa_status_payload_assert_enabled(x, key, hint) {
 
 # @title Ensure strict base permissions are set for repositories
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -201,7 +201,7 @@ org_default_repository_permission_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_org_default_repository_permission
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - current: string
 #
 #   For instance, `data` can take the following value:
@@ -231,10 +231,10 @@ org_default_repository_permission_payload_assert_current(x, key, hint) {
 
 # @title Ensure creation of GitHub public pages is restricted
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -308,7 +308,7 @@ org_members_permission_on_creating_public_pages_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_org_members_permission_on_creating_public_pages
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - allowed: boolean
 #
 #   For instance, `data` can take the following value:
@@ -338,10 +338,10 @@ org_members_permission_on_creating_public_pages_payload_assert_allowed(x, key, h
 
 # @title Ensure public repository creation is limited to specific members
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -418,7 +418,7 @@ org_members_permission_on_creating_public_repos_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_org_members_permission_on_creating_public_repos
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - allowed: boolean
 #
 #   For instance, `data` can take the following value:
@@ -448,10 +448,10 @@ org_members_permission_on_creating_public_repos_payload_assert_allowed(x, key, h
 
 # @title Ensure forking of GitHub repositories is restricted
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -525,7 +525,7 @@ org_members_permission_on_private_forking_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_org_members_permission_on_private_forking
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - allowed: boolean
 #
 #   For instance, `data` can take the following value:
@@ -555,10 +555,10 @@ org_members_permission_on_private_forking_payload_assert_allowed(x, key, hint) {
 
 # @title Ensure minimum number of administrators are set for the organization
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -635,7 +635,7 @@ org_owners_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:github_org_owners
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - admins: string
 #
 #   For instance, `data` can take the following value:

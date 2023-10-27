@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure that the contained_db_authentication_state  database flag a Cloud SQL for SQL Server instance is set to off
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -92,7 +92,7 @@ instance_sqlserver_contained_db_authentication_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_sql_instance_sqlserver_contained_db_authentication
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - contained_db_authentication_state: string
 #
 #   For instance, `data` can take the following value:

@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure IAM policies that allow full administrative privileges are not attached
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"

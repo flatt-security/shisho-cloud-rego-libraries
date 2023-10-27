@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure the S3 bucket for CloudTrail logs is not publicly accessible
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -94,7 +94,7 @@ log_bucket_accessibility_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_cloudtrail_log_bucket_accessibility
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - acl_rules: {"grantee_url": string, "permission": string}
 #   - bucket_name: string
 #   - bucket_policy_document: string

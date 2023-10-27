@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure that Cloud Storage buckets for storing logs are configured using bucket lock
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -94,7 +94,7 @@ bucket_retention_policy_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_logging_bucket_retention_policy
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - locked: boolean
 #   - retention_period: number
 #   - storage_bucket_name: string

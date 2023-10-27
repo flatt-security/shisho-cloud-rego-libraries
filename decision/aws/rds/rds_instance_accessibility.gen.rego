@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure that public access is not given to RDS instances
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -93,7 +93,7 @@ instance_accessibility_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_rds_instance_accessibility
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - is_publicly_accessible: boolean
 #
 #   For instance, `data` can take the following value:

@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure the AWS root user does not have access keys
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -93,7 +93,7 @@ root_user_key_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:aws_iam_root_user_key
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - root_has_access_keys: boolean
 #
 #   For instance, `data` can take the following value:

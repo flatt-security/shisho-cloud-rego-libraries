@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure that Cloud KMS cryptokeys are exposed only to trusted principals
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -92,7 +92,7 @@ key_accessibility_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_kms_key_accessibility
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - forbidden_bindings: {"principal": string, "role": string}
 #
 #   For instance, `data` can take the following value:

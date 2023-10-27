@@ -11,10 +11,10 @@ import future.keywords.every
 
 # @title Ensure secrets are not stored in Cloud Functions environment variables
 # You can emit this decision as follows:
-# 
+#
 # ```
 # import data.shisho
-# 
+#
 # decisions[d] {
 #   # the resource ID to review (e.g. a GitHub repository, etc.)
 #   subject := "test"
@@ -93,7 +93,7 @@ environment_variables_allowed(h) {
 # description: |
 #   Emits a decision entry describing the detail of a decision decision.api.shisho.dev/v1beta:googlecloud_functions_environment_variables
 #
-#   The parameter `data` is an object with the following fields: 
+#   The parameter `data` is an object with the following fields:
 #   - build_environment_variable_keys: string
 #   - service_environment_variable_keys: string
 #

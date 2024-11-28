@@ -72,6 +72,7 @@ root_user_usage_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:aws/cis-benchmark/v1.5.0": "1.7",
+			"decision.api.shisho.dev:aws/cis-benchmark/v3.0.0": "1.7",
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

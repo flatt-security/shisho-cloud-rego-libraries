@@ -72,6 +72,7 @@ bucket_read_trail_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:aws/cis-benchmark/v1.5.0": "3.11",
+			"decision.api.shisho.dev:aws/cis-benchmark/v3.0.0": "3.9",
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

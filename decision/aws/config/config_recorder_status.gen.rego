@@ -73,6 +73,8 @@ recorder_status_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:aws/cis-benchmark/v1.5.0": "3.5",
+			"decision.api.shisho.dev:aws/cis-benchmark/v3.0.0": "3.3",
+			"decision.api.shisho.dev:aws/fsbp/latest": "Config.1",
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

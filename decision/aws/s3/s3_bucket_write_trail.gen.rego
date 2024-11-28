@@ -72,6 +72,7 @@ bucket_write_trail_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:aws/cis-benchmark/v1.5.0": "3.10",
+			"decision.api.shisho.dev:aws/cis-benchmark/v3.0.0": "3.8",
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

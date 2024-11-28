@@ -74,6 +74,8 @@ account_alternate_contact_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:aws/cis-benchmark/v1.5.0": "1.2",
+			"decision.api.shisho.dev:aws/cis-benchmark/v3.0.0": "1.2",
+			"decision.api.shisho.dev:aws/fsbp/latest": "Account.1",
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

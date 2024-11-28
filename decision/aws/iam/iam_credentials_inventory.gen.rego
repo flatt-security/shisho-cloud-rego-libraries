@@ -73,7 +73,8 @@ credentials_inventory_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:aws/cis-benchmark/v1.5.0": "1.12",
-			"decision.api.shisho.dev:aws/fsbp/latest": "IAM.22",
+			"decision.api.shisho.dev:aws/cis-benchmark/v3.0.0": "1.12",
+			"decision.api.shisho.dev:aws/fsbp/latest": "IAM.8",
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

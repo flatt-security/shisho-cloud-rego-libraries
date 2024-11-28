@@ -72,6 +72,7 @@ bucket_policy_changes_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:aws/cis-benchmark/v1.5.0": "4.8",
+			"decision.api.shisho.dev:aws/cis-benchmark/v3.0.0": "4.8",
 			"decision.api.shisho.dev:needs-manual-review": "true",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
@@ -148,6 +149,8 @@ bucket_policy_changes_payload_assert_cis_notification_implementations_element(x,
 
 bucket_policy_changes_payload_assert_cis_notification_implementations_element_alarm_name(x, key, hint) {
 	not primitive.has_key(x, key)
+} else {
+	is_null(x[key])
 } else {
 	assertion.is_type(x[key], "string", hint)
 } else := false

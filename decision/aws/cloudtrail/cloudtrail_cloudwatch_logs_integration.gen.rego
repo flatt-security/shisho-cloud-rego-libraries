@@ -72,6 +72,7 @@ cloudwatch_logs_integration_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:aws/cis-benchmark/v1.5.0": "3.4",
+			"decision.api.shisho.dev:aws/fsbp/latest": "CloudTrail.5",
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},

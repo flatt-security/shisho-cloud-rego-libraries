@@ -160,5 +160,7 @@ api_keys_scope_payload_assert_targets_element_methods_element(x, key, hint) {
 api_keys_scope_payload_assert_targets_element_service(x, key, hint) {
 	not primitive.has_key(x, key)
 } else {
+	is_null(x[key])
+} else {
 	assertion.is_type(x[key], "string", hint)
 } else := false

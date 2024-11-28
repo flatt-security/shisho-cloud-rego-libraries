@@ -71,7 +71,7 @@ sg_ingress_v4_header(h) = x {
 		"labels": {},
 		"annotations": {
 			"decision.api.shisho.dev:aws/cis-benchmark/v1.5.0": "5.2",
-			"decision.api.shisho.dev:aws/fsbp/latest": "EC2.14",
+			"decision.api.shisho.dev:aws/cis-benchmark/v3.0.0": "5.2",
 			"decision.api.shisho.dev:needs-manual-review": "false",
 			"decision.api.shisho.dev:ssc/category": "infrastructure",
 		},
